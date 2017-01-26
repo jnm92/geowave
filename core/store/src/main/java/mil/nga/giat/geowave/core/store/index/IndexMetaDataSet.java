@@ -1,9 +1,13 @@
 package mil.nga.giat.geowave.core.store.index;
 
 import java.nio.ByteBuffer;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import mil.nga.giat.geowave.core.index.ByteArrayId;
 import mil.nga.giat.geowave.core.index.IndexMetaData;
@@ -21,37 +25,39 @@ public class IndexMetaDataSet<T> extends
 		DeleteCallback<T>
 {
 	private List<IndexMetaData> metaData;
-	public static final ByteArrayId STATS_ID = new ByteArrayId(
-			"INDEX_METADATA_");
+	public static final ByteArrayId STATS_TYPE = new ByteArrayId(
+			"INDEX_METADATA");
 
 	protected IndexMetaDataSet() {}
 
 	private IndexMetaDataSet(
 			final ByteArrayId adapterId,
-			final ByteArrayId statsId,
+			final ByteArrayId statisticsId,
 			final List<IndexMetaData> metaData ) {
 		super(
 				adapterId,
-				statsId);
+				composeId(statisticsId));
 		this.metaData = metaData;
 	}
 
 	public IndexMetaDataSet(
 			final ByteArrayId adapterId,
-			final ByteArrayId indexId,
+			final ByteArrayId statisticsId,
 			final IndexStrategy<?, ?> indexStrategy ) {
 		super(
 				adapterId,
-				composeId(indexId));
+				composeId(statisticsId));
 		this.metaData = indexStrategy.createMetaData();
 	}
 
 	public static ByteArrayId composeId(
-			final ByteArrayId indexId ) {
+			final ByteArrayId statisticsId ) {
 		return new ByteArrayId(
 				ArrayUtils.addAll(
-						STATS_ID.getBytes(),
-						indexId.getBytes()));
+						ArrayUtils.addAll(
+								STATS_TYPE.getBytes(),
+								STATS_SEPARATOR.getBytes()),
+						statisticsId.getBytes()));
 	}
 
 	@Override
@@ -139,4 +145,31 @@ public class IndexMetaDataSet<T> extends
 		}
 		return combinedMetaData != null ? combinedMetaData.toArray() : null;
 	}
+
+	/**
+	 * Convert Index Metadata statistics to a JSON object
+	 */
+
+	public JSONObject toJSONObject()
+			throws JSONException {
+		JSONObject jo = new JSONObject();
+		jo.put(
+				"type",
+				STATS_TYPE.getString());
+
+		jo.put(
+				"statisticsID",
+				statisticsId.getString());
+
+		JSONArray mdArray = new JSONArray();
+		for (final IndexMetaData imd : this.metaData) {
+			mdArray.put(imd.toJSONObject());
+		}
+		jo.put(
+				"metadata",
+				mdArray);
+
+		return jo;
+	}
+
 }

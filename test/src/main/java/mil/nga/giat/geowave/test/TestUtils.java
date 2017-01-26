@@ -77,7 +77,7 @@ public class TestUtils
 
 	public static final String TEST_FILTER_START_TIME_ATTRIBUTE_NAME = "StartTime";
 	public static final String TEST_FILTER_END_TIME_ATTRIBUTE_NAME = "EndTime";
-	public static final String TEST_NAMESPACE = "mil_nga_giat_geowave_test";
+	public static final String TEST_NAMESPACE = "wami.mil_nga_giat_geowave_test";
 	public static final String TEST_RESOURCE_PACKAGE = "mil/nga/giat/geowave/test/";
 	public static final String TEST_CASE_BASE = "data/";
 
@@ -181,7 +181,7 @@ public class TestUtils
 		try {
 			listStats.execute(new ManualOperationParams());
 		}
-		catch (final ParameterException e) {
+		catch (final Exception e) {
 			throw new RuntimeException(
 					e);
 		}

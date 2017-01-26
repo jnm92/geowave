@@ -52,11 +52,11 @@ public class BasicKafkaIT
 		EXPECTED_COUNT_PER_ADAPTER_ID.put(
 				new ByteArrayId(
 						"gpxpoint"),
-				11911);
+				137291);
 		EXPECTED_COUNT_PER_ADAPTER_ID.put(
 				new ByteArrayId(
 						"gpxtrack"),
-				5);
+				257);
 	}
 
 	protected static final String TEST_DATA_ZIP_RESOURCE_PATH = TestUtils.TEST_RESOURCE_PACKAGE
@@ -65,7 +65,6 @@ public class BasicKafkaIT
 
 	@GeoWaveTestStore({
 		GeoWaveStoreType.ACCUMULO,
-		GeoWaveStoreType.BIGTABLE,
 		GeoWaveStoreType.HBASE
 	})
 	protected DataStorePluginOptions dataStorePluginOptions;
@@ -124,13 +123,13 @@ public class BasicKafkaIT
 						.getDataStatistics(
 								adapter.getAdapterId(),
 								FeatureBoundingBoxStatistics.composeId(adapter
-										.getType()
+										.getFeatureType()
 										.getGeometryDescriptor()
 										.getLocalName()));
 				final CountDataStatistics<?> countStat = (CountDataStatistics<SimpleFeature>) statsStore
 						.getDataStatistics(
 								adapter.getAdapterId(),
-								CountDataStatistics.STATS_ID);
+								CountDataStatistics.STATS_TYPE);
 				// then query it
 				final GeometryFactory factory = new GeometryFactory();
 				final Envelope env = new Envelope(

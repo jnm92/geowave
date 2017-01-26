@@ -4,16 +4,20 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import mil.nga.giat.geowave.core.index.ByteArrayId;
 import mil.nga.giat.geowave.core.index.Mergeable;
 import mil.nga.giat.geowave.core.index.StringUtils;
+import mil.nga.giat.geowave.core.store.adapter.statistics.histogram.ByteUtils;
 import mil.nga.giat.geowave.core.store.base.DataStoreEntryInfo;
 
 public class RowRangeDataStatistics<T> extends
 		AbstractDataStatistics<T>
 {
-	public final static ByteArrayId STATS_ID = new ByteArrayId(
+	public final static ByteArrayId STATS_TYPE = new ByteArrayId(
 			"ROW_RANGE_");
 
 	private byte[] min = new byte[] {
@@ -26,18 +30,20 @@ public class RowRangeDataStatistics<T> extends
 	public RowRangeDataStatistics() {}
 
 	public RowRangeDataStatistics(
-			ByteArrayId indexId ) {
+			ByteArrayId statisticsId ) {
 		super(
-				indexId,
-				getId(indexId));
+				statisticsId,
+				composeId(statisticsId));
 	}
 
-	public static ByteArrayId getId(
-			ByteArrayId indexId ) {
+	public static ByteArrayId composeId(
+			ByteArrayId statisticsId ) {
 		return new ByteArrayId(
 				ArrayUtils.addAll(
-						STATS_ID.getBytes(),
-						indexId.getBytes()));
+						ArrayUtils.addAll(
+								STATS_TYPE.getBytes(),
+								STATS_SEPARATOR.getBytes()),
+						statisticsId.getBytes()));
 	}
 
 	public boolean isSet() {
@@ -180,4 +186,33 @@ public class RowRangeDataStatistics<T> extends
 		buffer.append("]");
 		return buffer.toString();
 	}
+
+	public JSONObject toJSONObject()
+			throws JSONException {
+		JSONObject jo = new JSONObject();
+		jo.put(
+				"type",
+				STATS_TYPE.getString());
+
+		jo.put(
+				"statisticsID",
+				statisticsId.getString());
+
+		if (isSet()) {
+			jo.put(
+					"min",
+					StringUtils.stringFromBinary(getMin()));
+			jo.put(
+					"max",
+					StringUtils.stringFromBinary(getMax()));
+		}
+		else {
+			jo.put(
+					"values",
+					"not set");
+		}
+
+		return jo;
+	}
+
 }

@@ -61,9 +61,10 @@ public class QueryOptionsIT
 					ATLANTA)));
 
 	@GeoWaveTestStore({
-		GeoWaveStoreType.ACCUMULO,
-		GeoWaveStoreType.HBASE,
-		GeoWaveStoreType.BIGTABLE
+		GeoWaveStoreType.ACCUMULO
+	/*
+	 * , GeoWaveStoreType.HBASE
+	 */
 	})
 	protected DataStorePluginOptions dataStoreOptions;
 
