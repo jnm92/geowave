@@ -59,12 +59,9 @@ public class DifferingFieldVisibilityEntryCount<T> extends
 
 	public static ByteArrayId composeId(
 			final ByteArrayId statisticsId ) {
-		return new ByteArrayId(
-				ArrayUtils.addAll(
-						ArrayUtils.addAll(
-								STATS_TYPE.getBytes(),
-								STATS_SEPARATOR.getBytes()),
-						statisticsId.getBytes()));
+		return composeId(
+				STATS_TYPE.getString(),
+				statisticsId.getString());
 	}
 
 	@Override
@@ -178,3 +175,5 @@ public class DifferingFieldVisibilityEntryCount<T> extends
 	}
 
 }
+
+

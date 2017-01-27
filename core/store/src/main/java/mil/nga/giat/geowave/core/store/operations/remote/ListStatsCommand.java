@@ -26,7 +26,7 @@ import mil.nga.giat.geowave.core.store.operations.remote.options.DataStorePlugin
 import mil.nga.giat.geowave.core.store.operations.remote.options.StatsCommandLineOptions;
 
 @GeowaveOperation(name = "liststats", parentOperation = RemoteSection.class)
-@Parameters(commandDescription = "Print statistics of an existing GeoWave dataset to standard output (boogie)")
+@Parameters(commandDescription = "Print statistics of an existing GeoWave dataset to standard output.  ")
 public class ListStatsCommand extends
 		AbstractStatsCommand implements
 		Command
