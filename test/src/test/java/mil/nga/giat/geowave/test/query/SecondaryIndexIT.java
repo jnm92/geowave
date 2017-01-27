@@ -91,8 +91,9 @@ import mil.nga.giat.geowave.test.annotation.GeoWaveTestStore.GeoWaveStoreType;
 public class SecondaryIndexIT
 {
 	@GeoWaveTestStore({
-		GeoWaveStoreType.ACCUMULO
-	/* , GeoWaveStoreType.HBASE */})
+		GeoWaveStoreType.ACCUMULO,
+		GeoWaveStoreType.HBASE
+	})
 	protected DataStorePluginOptions dataStoreOptions;
 	private FeatureDataAdapter dataAdapter;
 	private PrimaryIndex index;
