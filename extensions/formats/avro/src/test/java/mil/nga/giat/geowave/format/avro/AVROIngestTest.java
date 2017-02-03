@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import mil.nga.giat.geowave.adapter.vector.avro.AvroSimpleFeatureCollection;
+
 import mil.nga.giat.geowave.adapter.vector.ingest.DataSchemaOptionProvider;
 import mil.nga.giat.geowave.core.index.ByteArrayId;
 import mil.nga.giat.geowave.core.index.StringUtils;
