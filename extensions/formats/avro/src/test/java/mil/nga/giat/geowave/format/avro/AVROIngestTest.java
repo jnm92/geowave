@@ -75,6 +75,12 @@ public class AVROIngestTest
 
 		assertTrue(readExpectedCount);
 	}
+	
+	/* Features avro should have:
+	 * adapter
+	 * primaryIndexIds
+	 * simpleFeature
+	 */
 
 	private boolean isValidAVROFeature(
 			final GeoWaveData<SimpleFeature> feature ) {
@@ -93,6 +99,7 @@ public class AVROIngestTest
 
 	private boolean validate(
 			File file ) {
+
 		try {
 			DataFileReader.openReader(
 					file,
