@@ -1,56 +1,104 @@
-//package mil.nga.giat.geowave.core.cli.prefix;
-//
-//import static org.junit.Assert.*;
-//
-//import java.lang.reflect.AnnotatedElement;
-//import java.lang.reflect.Method;
-//
-//import org.junit.Test;
-//
-//import com.beust.jcommander.Parameterized;
-//
-//public class TranslationEntryTest {
-//	
-//	private TranslationEntry createTranslationEntry(){
-//		WrappedParameter wrapped = new WrappedParameter();
-//		Parameterized param = new Parameterized(null, null, null, null);
-//		return new TranslationEntry(null, null, null, null);
-//	}
-//
-//	public Parameterized getParam() {
-//		return param;
-//	}
-//
-//	public Object getObject() {
-//		return object;
-//	}
-//
-//	public String getPrefix() {
-//		return prefix;
-//	}
-//
-//	public boolean isMethod() {
-//		return member instanceof Method;
-//	}
-//
-//	public AnnotatedElement getMember() {
-//		return member;
-//	}
-//
-//	public String[] getPrefixedNames() {
-//		return prefixedNames;
-//	}
-//
-//	public String getDescription() {
-//		String description = null;
-//		if (getParam().getParameter() != null && getParam().getParameter().description() != null) {
-//			description = getParam().getParameter().description();
-//		}
-//		else if (getParam().isDynamicParameter()) {
-//			description = getParam().getWrappedParameter().getDynamicParameter().description();
-//		}
-//		return description == null ? "<no description>" : description;
-//	}
+package mil.nga.giat.geowave.core.cli.prefix;
+
+import static org.junit.Assert.*;
+
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameterized;
+import com.beust.jcommander.WrappedParameter;
+
+import junit.framework.Assert;
+
+public class TranslationEntryTest {
+
+	private static class TestClass {
+		int field;
+		public void method(){
+			return;
+		}
+	}	
+
+	static TranslationEntry entry;
+	static Parameterized param;
+	static String obj;
+	static String prefix;
+	static AnnotatedElement aElement; 
+
+	@Parameter(names = "-a",description = "its a")
+	private static Integer a;
+	
+	@Before
+	public void setUp(){
+		System.out.println("Started setup");
+		
+		try {
+			
+			param = new Parameterized(new WrappedParameter((Parameter)null),null,
+						TestClass.class.getDeclaredField("field"),
+						TestClass.class.getDeclaredMethod("method", null));
+		} catch (NoSuchFieldException | SecurityException | NoSuchMethodException e) {
+			// Should never trigger
+			e.printStackTrace();
+		}
+		obj = "abc";
+		prefix = "123";
+		aElement = String.class;
+		entry = new TranslationEntry(param, (Object) obj, prefix, aElement);
+		System.out.println("Done setup");
+	}
+
+	@Test
+	public void testGetParam() {
+		Assert.assertEquals(param, entry.getParam());
+	}
+	
+	@Test
+	public void testGetObject(){
+		Assert.assertEquals(obj, entry.getObject());
+	}
+	
+	@Test
+	public void testGetPrefix(){
+		Assert.assertEquals(prefix, entry.getPrefix());
+	}
+	
+	@Test
+	public void testIsMethodFalse(){
+		Assert.assertFalse(entry.isMethod());
+	}
+	
+	@Test
+	public void testIsMethodTrue(){
+		fail("Not implemented");
+	}
+	
+	@Test
+	public void testGetMember(){
+		Assert.assertEquals(aElement, entry.getMember());
+	}
+	
+	@Test
+	public void testGetPrefixedNames(){
+		Assert.assertTrue(Arrays.asList(entry.getPrefixedNames()).contains(prefix));
+	}
+	
+	@Test
+	public void testGetDescription(){
+		Assert.assertEquals("<no descriptions>", entry.getDescription());
+	}
+	
+	@Test
+	public void testIsPassword(){
+		
+	}
+	
+	
 //
 //	public boolean isPassword() {
 //		if (getParam().getParameter() != null) {
@@ -104,4 +152,4 @@
 //		return trimNonAlphabetic(getLongestParam(getPrefixedNames()));
 //	}
 //
-//}
+}
