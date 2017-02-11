@@ -4,24 +4,31 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameterized;
+import com.beust.jcommander.ParametersDelegate;
 import com.beust.jcommander.WrappedParameter;
 
 import junit.framework.Assert;
+import mil.nga.giat.geowave.core.cli.annotations.PrefixParameter;
 
 public class TranslationEntryTest {
 
-	private static class TestClass {
+	private static class Arguments {
+		@Parameter(names = "-name", description = "name description")
 		int field;
-		public void method(){
-			return;
-		}
+		
+		@ParametersDelegate
+		@PrefixParameter(prefix = "obj")
+		Map<String, Integer> map;
 	}	
 
 	static TranslationEntry entry;
@@ -29,28 +36,27 @@ public class TranslationEntryTest {
 	static String obj;
 	static String prefix;
 	static AnnotatedElement aElement; 
-
-	@Parameter(names = "-a",description = "its a")
-	private static Integer a;
 	
 	@Before
-	public void setUp(){
-		System.out.println("Started setup");
-		
+	public void setUp(){		
 		try {
 			
-			param = new Parameterized(new WrappedParameter((Parameter)null),null,
-						TestClass.class.getDeclaredField("field"),
-						TestClass.class.getDeclaredMethod("method", null));
-		} catch (NoSuchFieldException | SecurityException | NoSuchMethodException e) {
+			Arguments args = new Arguments();
+			ArrayList<Parameterized> params = (ArrayList<Parameterized>) Parameterized.parseArg(args);
+			if (params.size() == 0){
+				fail("Could not find parameter");
+			}
+			
+			param = params.get(0);
+			
+		} catch (SecurityException e) {
 			// Should never trigger
 			e.printStackTrace();
 		}
-		obj = "abc";
-		prefix = "123";
+		obj = "obj";
+		prefix = "prefix";
 		aElement = String.class;
 		entry = new TranslationEntry(param, (Object) obj, prefix, aElement);
-		System.out.println("Done setup");
 	}
 
 	@Test
@@ -69,13 +75,8 @@ public class TranslationEntryTest {
 	}
 	
 	@Test
-	public void testIsMethodFalse(){
+	public void testIsMethod(){
 		Assert.assertFalse(entry.isMethod());
-	}
-	
-	@Test
-	public void testIsMethodTrue(){
-		fail("Not implemented");
 	}
 	
 	@Test
@@ -85,12 +86,12 @@ public class TranslationEntryTest {
 	
 	@Test
 	public void testGetPrefixedNames(){
-		Assert.assertTrue(Arrays.asList(entry.getPrefixedNames()).contains(prefix));
+		Assert.assertTrue(Arrays.asList(entry.getPrefixedNames()).contains("-"+prefix+".name"));
 	}
 	
 	@Test
 	public void testGetDescription(){
-		Assert.assertEquals("<no descriptions>", entry.getDescription());
+		Assert.assertEquals("name description", entry.getDescription());
 	}
 	
 	@Test
@@ -98,58 +99,4 @@ public class TranslationEntryTest {
 		
 	}
 	
-	
-//
-//	public boolean isPassword() {
-//		if (getParam().getParameter() != null) {
-//			return getParam().getParameter().password();
-//		}
-//		else if (getParam().getWrappedParameter() != null) {
-//			return getParam().getWrappedParameter().password();
-//		}
-//		return false;
-//	}
-//
-//	public boolean isHidden() {
-//		if (getParam().getParameter() != null) {
-//			return getParam().getParameter().hidden();
-//		}
-//		else if (getParam().getWrappedParameter() != null) {
-//			return getParam().getWrappedParameter().hidden();
-//		}
-//		return false;
-//	}
-//
-//	public boolean isRequired() {
-//		if (getParam().getParameter() != null) {
-//			return getParam().getParameter().required();
-//		}
-//		else if (getParam().getWrappedParameter() != null) {
-//			return getParam().getWrappedParameter().required();
-//		}
-//		return false;
-//	}
-//
-//	/**
-//	 * Whether the given object has a value specified. If the current value is
-//	 * non null, then return true.
-//	 * 
-//	 * @return
-//	 */
-//	public boolean hasValue() {
-//		Object value = getParam().get(
-//				getObject());
-//		return value != null;
-//	}
-//
-//	/**
-//	 * Property name is used to write to properties files, but also to report
-//	 * option names to Geoserver.
-//	 * 
-//	 * @return
-//	 */
-//	public String getAsPropertyName() {
-//		return trimNonAlphabetic(getLongestParam(getPrefixedNames()));
-//	}
-//
 }

@@ -95,7 +95,7 @@ public class JavassistUtilsTest {
       ClassFile class2file = class2.getClassFile2();
       AnnotationsAttribute classAnnotations = (AnnotationsAttribute) class2file.getAttribute(AnnotationsAttribute.visibleTag);
       
-      // TODO might have to extract annotations or something
+      // TODO might have to extract annotations 
       Assert.assertEquals(attribute, classAnnotations);
   }
   
@@ -127,7 +127,7 @@ public class JavassistUtilsTest {
 	  }
 
 	  
-	  ctmethod.getMethodInfo().addAttribute(new AnnotationsAttribute(null, "method annotation"));
+	  ctmethod.getMethodInfo().addAttribute(new AnnotationsAttribute(new ConstPool("mil.nga.giat.geowave.core.cli.prefix.TestClass"), "method annotation"));
 	  
 	  JavassistUtils.copyMethodAnnotationsToField(ctmethod, ctfield1);
   }
