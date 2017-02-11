@@ -3,6 +3,7 @@ package mil.nga.giat.geowave.core.cli.prefix;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -14,146 +15,207 @@ import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
+import javassist.bytecode.annotation.IntegerMemberValue;
 import junit.framework.Assert;
 import mil.nga.giat.geowave.core.cli.prefix.JavassistUtils;
 
 public class JavassistUtilsTest {
 
-  @Test
-  public void testCloneAnnotationsAttribute() {
-	  ConstPool constPool = new ConstPool("cloneAnnotationsAttrTest");
-	  AnnotationsAttribute origAttr = new AnnotationsAttribute(constPool, "original");
-      AnnotationsAttribute clonedAttr = JavassistUtils
-    		  .cloneAnnotationsAttribute(constPool, origAttr, null);
-      
-      System.out.println(clonedAttr.getName());
-  }
-  
-  private static class FindMethodTest {
-	  public void doNothing() {
-		  return;
-	  }
-  }
-  
-  @Test
-  public void testFindMethod() {
-	  
-      CtClass ctclass = ClassPool.getDefault().makeClass("testFindMethodClass");
-      CtMethod ctmethod;
-      
-      try {
-		  ctmethod = CtNewMethod.make("public void doNothing() { return; }", ctclass);
-		  ctclass.addMethod(ctmethod); // TODO do need to make and add?
-		  
-      } catch (CannotCompileException e) {
-		  // Should never trigger since src attr is fixed
-		  e.printStackTrace();
-		  fail("Could not compile method");
-	  }
-      
-      Method m = null;
-      for (Method method : FindMethodTest.class.getMethods()){
-    	  if (method.getName().equals("doNothing")){
-    		  m = method;
-    		  break;
-    	  }
-      }
-      
-      if (m == null){
-    	  fail("Could not find method in Java class");
-      }
-      
-      try {
-		CtMethod foundMethod = JavassistUtils.findMethod(ctclass, m);
-	} catch (NotFoundException e) {
-		e.printStackTrace();
-		fail("Could not find method in CtClass");
+	@Test
+	public void testCloneAnnotationsAttribute() {
+		CtClass clz = ClassPool.getDefault().makeClass("testCloneAnnotationsAttribute");
+		CtMethod ctmethod = addNewMethod(clz, "origMethod");
+		AnnotationsAttribute attr = annotateMethod(ctmethod, "origAnno", 135);
+		
+		AnnotationsAttribute clonedAttr = JavassistUtils
+				.cloneAnnotationsAttribute(ctmethod.getMethodInfo().getConstPool(), attr, java.lang.annotation.ElementType.METHOD);
+		
+		Assert.assertEquals(135, ((IntegerMemberValue) clonedAttr.getAnnotation("java.lang.Integer").getMemberValue("origAnno")).getValue());
 	}
-      
-      
-  }
-  
-  @Test
-  public void testCopyClassAnnontations() {
-      CtClass class1 = ClassPool.getDefault().makeClass("testCopyClassAnnotations1");
-      CtClass class2 = ClassPool.getDefault().makeClass("testCopyClassAnnotations2");
-      
-      ClassFile class1file = class1.getClassFile();
-      ConstPool class1pool = class1file.getConstPool();
-      
-      AnnotationsAttribute attribute = new AnnotationsAttribute(class1pool, AnnotationsAttribute.visibleTag);
-      attribute.addAnnotation(new Annotation("test1", class1pool));
-      
-      class1file.addAttribute(attribute);
-      
-      JavassistUtils.copyClassAnnotations(class1, class2);
-      
-      // For some reason, getClassFile2 gets a read-only copy of the class file
-      ClassFile class2file = class2.getClassFile2();
-      AnnotationsAttribute classAnnotations = (AnnotationsAttribute) class2file.getAttribute(AnnotationsAttribute.visibleTag);
-      
-      // TODO might have to extract annotations 
-      Assert.assertEquals(attribute, classAnnotations);
-  }
-  
-  class TestClass {
-	  int field1;
-	  String field2;
-	  
-	  public void doNothing(){
-		  return;
-	  }
-  }
-  
-  @Test
-  public void testCopyMethodAnnotationsToField() {
-	  
-	  CtClass ctclass;
-	  CtMethod ctmethod = null;
-	  CtField ctfield1 = null, ctfield2 = null;
-	  
-	  try {
-		  ctclass = ClassPool.getDefault().get("mil.nga.giat.geowave.core.cli.prefix.TestClass");
-		  ClassFile ctfile = ctclass.getClassFile();
-		  ConstPool ctpool = ctfile.getConstPool();
-		  ctfield1 = ctclass.getField("field1");
-		  ctfield2 = ctclass.getField("field2");
-		  ctmethod = ctclass.getDeclaredMethod("doNothing");
-	  } catch (NotFoundException e) {
-		  e.printStackTrace();
-	  }
 
-	  
-	  ctmethod.getMethodInfo().addAttribute(new AnnotationsAttribute(new ConstPool("mil.nga.giat.geowave.core.cli.prefix.TestClass"), "method annotation"));
-	  
-	  JavassistUtils.copyMethodAnnotationsToField(ctmethod, ctfield1);
-  }
-    
-    @Test
-    public void testGetNextUniqueClassName() {
-        String unique1 = JavassistUtils.getNextUniqueClassName();
-        String unique2 = JavassistUtils.getNextUniqueClassName();
-        
-        Assert.assertFalse(unique1.equals(unique2));
-    }
-    
-  @Test 
-  public void testGetNextUniqueFieldName() {
-      String unique1 = JavassistUtils.getNextUniqueFieldName();
-      String unique2 = JavassistUtils.getNextUniqueFieldName();
-      
-      Assert.assertFalse(unique1.equals(unique2));
-  }
-  
-  @Test 
-  public void testGenerateEmptyClass() {
-      CtClass emptyClass = JavassistUtils.generateEmptyClass();
-      CtClass anotherEmptyClass = JavassistUtils.generateEmptyClass();
-      
-      Assert.assertFalse(emptyClass.equals(anotherEmptyClass));
-  }
+	private static class FindMethodTest {
+		public void method1() {
+			return;
+		}
+		public void methodA(){
+			return;
+		}
+	}
+
+	@Test
+	public void testFindMethod() {
+		CtClass ctclass = ClassPool.getDefault().makeClass("testFindMethodClass");
+		addNewMethod(ctclass, "method1");
+		addNewMethod(ctclass, "method2");
+	
+		Method m = null;
+		try {
+			m = FindMethodTest.class.getMethod("method1");
+		} catch (NoSuchMethodException | SecurityException e1) {
+			e1.printStackTrace();
+			return;
+		}
+
+		try {
+			CtMethod foundMethod = JavassistUtils.findMethod(ctclass, m);
+			Assert.assertEquals("method1", foundMethod.getName());
+		} catch (NotFoundException e) {
+			e.printStackTrace();
+			fail("Could not find method in CtClass");
+		}
+	}
+
+	@Test
+	public void testCopyClassAnnontations() {
+		CtClass fromClass = ClassPool.getDefault().makeClass("fromClass");
+		CtClass toClass = ClassPool.getDefault().makeClass("toClass");
+		
+		// Create class annotations
+		ConstPool fromPool = fromClass.getClassFile().getConstPool();
+		AnnotationsAttribute attr = new AnnotationsAttribute(fromPool, AnnotationsAttribute.visibleTag);
+		Annotation anno = new Annotation("java.lang.Integer", fromPool);
+		anno.addMemberValue("copyClassName", new IntegerMemberValue(fromPool, 246));
+		attr.addAnnotation(anno);
+		fromClass.getClassFile().addAttribute(attr);
+		
+		JavassistUtils.copyClassAnnotations(fromClass, toClass);
+
+		Annotation toAnno = ((AnnotationsAttribute)toClass.getClassFile().getAttribute(AnnotationsAttribute.visibleTag)).getAnnotation("java.lang.Integer");
+		
+		Assert.assertEquals(246, ((IntegerMemberValue)toAnno.getMemberValue("copyClassName")).getValue());
+	}
+
+	class TestClass {
+		int field1;
+		String field2;
+
+		public void doNothing(){
+			return;
+		}
+	}
+
+	private CtMethod addNewMethod(CtClass clz, String methodName){
+		CtMethod ctmethod = null;
+		try {
+			ctmethod = CtNewMethod.make("void "+methodName+"(){ return; }",clz);
+			clz.addMethod(ctmethod);
+		} catch (CannotCompileException e) {
+			e.printStackTrace();
+		}
+		if (ctmethod == null){
+			fail("Could not create method");
+		}
+		
+		return ctmethod;
+	}	
+	
+	private AnnotationsAttribute annotateMethod(CtMethod ctmethod, String annotationName, int annotationValue){
+		AnnotationsAttribute attr = new AnnotationsAttribute(ctmethod.getMethodInfo().getConstPool(), AnnotationsAttribute.visibleTag);
+		Annotation anno = new Annotation("java.lang.Integer", ctmethod.getMethodInfo().getConstPool());
+		anno.addMemberValue(annotationName, new IntegerMemberValue(ctmethod.getMethodInfo().getConstPool(), annotationValue));
+		attr.addAnnotation(anno);
+		
+		ctmethod.getMethodInfo().addAttribute(attr);
+		
+		return attr;
+	}
+	
+	private CtField addNewField(CtClass clz, String fieldName){
+		CtField ctfield = null;
+		try {
+			ctfield = new CtField(clz, fieldName, clz);
+			clz.addField(ctfield);
+		} catch (CannotCompileException e) {
+			e.printStackTrace();
+		}
+		if (ctfield == null){
+			fail("Could not create method");
+		}
+		
+		return ctfield;
+	}
+	
+	private void annotateField(CtField ctfield, String annotationName, int annotationValue){
+		AnnotationsAttribute attr = new AnnotationsAttribute(ctfield.getFieldInfo().getConstPool(), AnnotationsAttribute.visibleTag);
+		Annotation anno = new Annotation("java.lang.Integer", ctfield.getFieldInfo().getConstPool());
+		anno.addMemberValue(annotationName, new IntegerMemberValue(ctfield.getFieldInfo().getConstPool(), annotationValue));
+		attr.addAnnotation(anno);
+		
+		ctfield.getFieldInfo().addAttribute(attr);
+	}
+	
+	@Test
+	public void testCopyMethodAnnotationsToField() {
+		
+		CtClass ctclass = ClassPool.getDefault().makeClass("test");
+
+		CtMethod createdMethod = addNewMethod(ctclass, "doNothing");
+		annotateMethod(createdMethod, "value", 123);
+		
+		CtField createdField = addNewField(ctclass, "toField");
+
+		JavassistUtils.copyMethodAnnotationsToField(createdMethod, createdField);
+		
+		IntegerMemberValue i = null;
+		for (Annotation annot : ((AnnotationsAttribute)createdField.getFieldInfo().getAttribute(AnnotationsAttribute.visibleTag))
+				.getAnnotations()){
+			i = (IntegerMemberValue)annot.getMemberValue("value");
+			if (i != null){
+				break;
+			}
+		}
+		if (i == null || i.getValue() != 123){
+			fail("Expected annotation value 123 but found "+i);
+		}
+	}
+
+	@Test
+	public void testGetNextUniqueClassName() {
+		String unique1 = JavassistUtils.getNextUniqueClassName();
+		String unique2 = JavassistUtils.getNextUniqueClassName();
+
+		Assert.assertFalse(unique1.equals(unique2));
+	}
+	
+
+	@Test 
+	public void testGetNextUniqueFieldName() {
+		String unique1 = JavassistUtils.getNextUniqueFieldName();
+		String unique2 = JavassistUtils.getNextUniqueFieldName();
+
+		Assert.assertFalse(unique1.equals(unique2));
+	}
+
+	@Test 
+	public void testGenerateEmptyClass() {
+		CtClass emptyClass = JavassistUtils.generateEmptyClass();
+		CtClass anotherEmptyClass = JavassistUtils.generateEmptyClass();
+
+		Assert.assertFalse(emptyClass.equals(anotherEmptyClass));
+		
+		// test empty class works as expected
+		CtMethod method = addNewMethod(emptyClass, "a");
+		annotateMethod(method, "abc", 7);
+		CtField field = addNewField(emptyClass, "d");
+		annotateField(field, "def", 9);
+		
+		Assert.assertEquals(7,
+				((IntegerMemberValue)
+				((AnnotationsAttribute)method.getMethodInfo()
+						.getAttribute(AnnotationsAttribute.visibleTag))
+						.getAnnotation("java.lang.Integer")
+						.getMemberValue("abc")).getValue());
+		
+		Assert.assertEquals(9,
+				((IntegerMemberValue)
+				((AnnotationsAttribute)field.getFieldInfo()
+						.getAttribute(AnnotationsAttribute.visibleTag))
+						.getAnnotation("java.lang.Integer")
+						.getMemberValue("def")).getValue());
+	}
 
 }
