@@ -25,16 +25,18 @@ import mil.nga.giat.geowave.core.cli.prefix.PrefixedJCommander.PrefixedJCommande
 
 public class PrefixedJCommanderTest {
     
+	// done
     @Test
     public void testAddCommand(){
     	PrefixedJCommander prefixedJCommander = new PrefixedJCommander();
     	
     	prefixedJCommander.addCommand("abc",(Object) "hello, world","a");
+    	prefixedJCommander.addCommand("def", (Object) "goodbye, world", "b");
     	prefixedJCommander.parse("abc");
     	Assert.assertEquals(prefixedJCommander.getParsedCommand(),"abc");
     }
     
-
+    // done
 	@Test
 	public void testNullDelegate() {
 		PrefixedJCommander commander = new PrefixedJCommander();
@@ -43,6 +45,7 @@ public class PrefixedJCommanderTest {
 		commander.parse();
 	}
 
+	// done
 	@Test
 	public void testMapDelegatesPrefix() {
 		Arguments args = new Arguments();
@@ -65,6 +68,7 @@ public class PrefixedJCommanderTest {
 				args.argChildren.get("def").arg);
 	}
 
+	// done
 	@Test
 	public void testCollectionDelegatesPrefix() {
 		ArgumentsCollection args = new ArgumentsCollection();
@@ -88,6 +92,7 @@ public class PrefixedJCommanderTest {
 				((ArgumentChildrenOther) args.argChildren.get(1)).arg2);
 	}
 
+	// done
 	@Test
 	public void testPrefixParameter() {
 		PrefixedArguments args = new PrefixedArguments();
@@ -108,6 +113,7 @@ public class PrefixedJCommanderTest {
 				args.blah);
 	}
 	
+	// done
 	@Test
 	public void testAddGetPrefixedObjects(){
 		PrefixedArguments args = new PrefixedArguments();
