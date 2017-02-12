@@ -89,6 +89,76 @@ public class JavassistUtilsTest {
 		Assert.assertEquals(246, ((IntegerMemberValue)toAnno.getMemberValue("copyClassName")).getValue());
 	}
 
+	
+	@Test
+	public void testCopyMethodAnnotationsToField() {
+		
+		CtClass ctclass = ClassPool.getDefault().makeClass("test");
+
+		CtMethod createdMethod = addNewMethod(ctclass, "doNothing");
+		annotateMethod(createdMethod, "value", 123);
+		
+		CtField createdField = addNewField(ctclass, "toField");
+
+		JavassistUtils.copyMethodAnnotationsToField(createdMethod, createdField);
+		
+		IntegerMemberValue i = null;
+		for (Annotation annot : ((AnnotationsAttribute)createdField.getFieldInfo().getAttribute(AnnotationsAttribute.visibleTag))
+				.getAnnotations()){
+			i = (IntegerMemberValue)annot.getMemberValue("value");
+			if (i != null){
+				break;
+			}
+		}
+		if (i == null || i.getValue() != 123){
+			fail("Expected annotation value 123 but found "+i);
+		}
+	}
+
+	@Test
+	public void testGetNextUniqueClassName() {
+		String unique1 = JavassistUtils.getNextUniqueClassName();
+		String unique2 = JavassistUtils.getNextUniqueClassName();
+
+		Assert.assertFalse(unique1.equals(unique2));
+	}
+
+	@Test 
+	public void testGetNextUniqueFieldName() {
+		String unique1 = JavassistUtils.getNextUniqueFieldName();
+		String unique2 = JavassistUtils.getNextUniqueFieldName();
+
+		Assert.assertFalse(unique1.equals(unique2));
+	}
+
+	@Test 
+	public void testGenerateEmptyClass() {
+		CtClass emptyClass = JavassistUtils.generateEmptyClass();
+		CtClass anotherEmptyClass = JavassistUtils.generateEmptyClass();
+
+		Assert.assertFalse(emptyClass.equals(anotherEmptyClass));
+		
+		// test empty class works as expected
+		CtMethod method = addNewMethod(emptyClass, "a");
+		annotateMethod(method, "abc", 7);
+		CtField field = addNewField(emptyClass, "d");
+		annotateField(field, "def", 9);
+		
+		Assert.assertEquals(7,
+				((IntegerMemberValue)
+				((AnnotationsAttribute)method.getMethodInfo()
+						.getAttribute(AnnotationsAttribute.visibleTag))
+						.getAnnotation("java.lang.Integer")
+						.getMemberValue("abc")).getValue());
+		
+		Assert.assertEquals(9,
+				((IntegerMemberValue)
+				((AnnotationsAttribute)field.getFieldInfo()
+						.getAttribute(AnnotationsAttribute.visibleTag))
+						.getAnnotation("java.lang.Integer")
+						.getMemberValue("def")).getValue());
+	}
+	
 	class TestClass {
 		int field1;
 		String field2;
@@ -147,75 +217,4 @@ public class JavassistUtilsTest {
 		
 		ctfield.getFieldInfo().addAttribute(attr);
 	}
-	
-	@Test
-	public void testCopyMethodAnnotationsToField() {
-		
-		CtClass ctclass = ClassPool.getDefault().makeClass("test");
-
-		CtMethod createdMethod = addNewMethod(ctclass, "doNothing");
-		annotateMethod(createdMethod, "value", 123);
-		
-		CtField createdField = addNewField(ctclass, "toField");
-
-		JavassistUtils.copyMethodAnnotationsToField(createdMethod, createdField);
-		
-		IntegerMemberValue i = null;
-		for (Annotation annot : ((AnnotationsAttribute)createdField.getFieldInfo().getAttribute(AnnotationsAttribute.visibleTag))
-				.getAnnotations()){
-			i = (IntegerMemberValue)annot.getMemberValue("value");
-			if (i != null){
-				break;
-			}
-		}
-		if (i == null || i.getValue() != 123){
-			fail("Expected annotation value 123 but found "+i);
-		}
-	}
-
-	@Test
-	public void testGetNextUniqueClassName() {
-		String unique1 = JavassistUtils.getNextUniqueClassName();
-		String unique2 = JavassistUtils.getNextUniqueClassName();
-
-		Assert.assertFalse(unique1.equals(unique2));
-	}
-	
-
-	@Test 
-	public void testGetNextUniqueFieldName() {
-		String unique1 = JavassistUtils.getNextUniqueFieldName();
-		String unique2 = JavassistUtils.getNextUniqueFieldName();
-
-		Assert.assertFalse(unique1.equals(unique2));
-	}
-
-	@Test 
-	public void testGenerateEmptyClass() {
-		CtClass emptyClass = JavassistUtils.generateEmptyClass();
-		CtClass anotherEmptyClass = JavassistUtils.generateEmptyClass();
-
-		Assert.assertFalse(emptyClass.equals(anotherEmptyClass));
-		
-		// test empty class works as expected
-		CtMethod method = addNewMethod(emptyClass, "a");
-		annotateMethod(method, "abc", 7);
-		CtField field = addNewField(emptyClass, "d");
-		annotateField(field, "def", 9);
-		
-		Assert.assertEquals(7,
-				((IntegerMemberValue)
-				((AnnotationsAttribute)method.getMethodInfo()
-						.getAttribute(AnnotationsAttribute.visibleTag))
-						.getAnnotation("java.lang.Integer")
-						.getMemberValue("abc")).getValue());
-		
-		Assert.assertEquals(9,
-				((IntegerMemberValue)
-				((AnnotationsAttribute)field.getFieldInfo()
-						.getAttribute(AnnotationsAttribute.visibleTag))
-						.getAnnotation("java.lang.Integer")
-						.getMemberValue("def")).getValue());
-	}
-
 }

@@ -25,7 +25,6 @@ import mil.nga.giat.geowave.core.cli.prefix.PrefixedJCommander.PrefixedJCommande
 
 public class PrefixedJCommanderTest {
     
-	// done
     @Test
     public void testAddCommand(){
     	PrefixedJCommander prefixedJCommander = new PrefixedJCommander();
@@ -36,7 +35,6 @@ public class PrefixedJCommanderTest {
     	Assert.assertEquals(prefixedJCommander.getParsedCommand(),"abc");
     }
     
-    // done
 	@Test
 	public void testNullDelegate() {
 		PrefixedJCommander commander = new PrefixedJCommander();
@@ -45,7 +43,6 @@ public class PrefixedJCommanderTest {
 		commander.parse();
 	}
 
-	// done
 	@Test
 	public void testMapDelegatesPrefix() {
 		Arguments args = new Arguments();
@@ -68,7 +65,6 @@ public class PrefixedJCommanderTest {
 				args.argChildren.get("def").arg);
 	}
 
-	// done
 	@Test
 	public void testCollectionDelegatesPrefix() {
 		ArgumentsCollection args = new ArgumentsCollection();
@@ -92,7 +88,6 @@ public class PrefixedJCommanderTest {
 				((ArgumentChildrenOther) args.argChildren.get(1)).arg2);
 	}
 
-	// done
 	@Test
 	public void testPrefixParameter() {
 		PrefixedArguments args = new PrefixedArguments();
@@ -113,7 +108,6 @@ public class PrefixedJCommanderTest {
 				args.blah);
 	}
 	
-	// done
 	@Test
 	public void testAddGetPrefixedObjects(){
 		PrefixedArguments args = new PrefixedArguments();
@@ -122,7 +116,7 @@ public class PrefixedJCommanderTest {
 		Assert.assertTrue(commander.getPrefixedObjects().contains(args) && commander.getPrefixedObjects().size() == 1);
 	}
 
-	public static class PrefixedArguments
+	private static class PrefixedArguments
 	{
 		@ParametersDelegate
 		@PrefixParameter(prefix = "abc")
@@ -132,31 +126,31 @@ public class PrefixedJCommanderTest {
 		private String blah;
 	}
 
-	public static class NullDelegate
+	private static class NullDelegate
 	{
 		@ParametersDelegate
 		private ArgumentChildren value = null;
 	}
 
-	public static class ArgumentsCollection
+	private static class ArgumentsCollection
 	{
 		@ParametersDelegate
 		private List<Object> argChildren = new ArrayList<Object>();
 	}
 
-	public static class Arguments
+	private static class Arguments
 	{
 		@ParametersDelegate
 		private Map<String, ArgumentChildren> argChildren = new HashMap<String, ArgumentChildren>();
 	}
 
-	public static class ArgumentChildren
+	private static class ArgumentChildren
 	{
 		@Parameter(names = "--arg")
 		private String arg;
 	}
 
-	public static class ArgumentChildrenOther
+	private static class ArgumentChildrenOther
 	{
 		@Parameter(names = "--arg2")
 		private String arg2;
