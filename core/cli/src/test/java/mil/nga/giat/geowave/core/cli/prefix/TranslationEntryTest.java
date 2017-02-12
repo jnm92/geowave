@@ -24,7 +24,7 @@ public class TranslationEntryTest {
 
 	private static class Arguments {
 		@Parameter(names = "-name", description = "name description")
-		int field;
+		Integer field;
 		
 		@ParametersDelegate
 		@PrefixParameter(prefix = "obj")
@@ -33,7 +33,7 @@ public class TranslationEntryTest {
 
 	static TranslationEntry entry;
 	static Parameterized param;
-	static String obj;
+	static Integer obj;
 	static String prefix;
 	static AnnotatedElement aElement; 
 	
@@ -53,9 +53,9 @@ public class TranslationEntryTest {
 			// Should never trigger
 			e.printStackTrace();
 		}
-		obj = "obj";
+		obj = 4;
 		prefix = "prefix";
-		aElement = String.class;
+		aElement = Integer.class;
 		entry = new TranslationEntry(param, (Object) obj, prefix, aElement);
 	}
 
@@ -96,7 +96,21 @@ public class TranslationEntryTest {
 	
 	@Test
 	public void testIsPassword(){
-		
+		Assert.assertFalse(entry.isPassword());
 	}
 	
+	@Test
+	public void testIsHidden(){
+		Assert.assertFalse(entry.isHidden());
+	}
+	
+	@Test
+	public void testIsRequired(){
+		Assert.assertFalse(entry.isRequired());
+	}
+	
+	@Test
+	public void testGetAsPropertyName(){
+		Assert.assertEquals("prefix.name", entry.getAsPropertyName());
+	}
 }
