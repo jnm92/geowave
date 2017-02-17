@@ -1,5 +1,7 @@
 package mil.nga.giat.geowave.service.rest;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import org.reflections.Reflections;
@@ -14,9 +16,14 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Router;
 
+
+import javassist.ClassPool;
+import mil.nga.giat.geowave.core.cli.operations.HelpCommand;
+
 public class RestServer extends
 		ServerResource
 {
+
 	private ArrayList<Route> availableRoutes;
 
 	/**
@@ -45,7 +52,6 @@ public class RestServer extends
 				"Available Routes: (geowave/help is only that currently extends ServerResource)<br>");
 		for (Route route : availableRoutes) {
 			routeStringBuilder.append(route.getPath() + "<br>");
-
 		}
 		return "<b>404</b>: Route not found<br><br>" + routeStringBuilder.toString();
 	}
