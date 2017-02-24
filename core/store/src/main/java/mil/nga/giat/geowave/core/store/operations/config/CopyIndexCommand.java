@@ -5,11 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-// new code
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.resource.Get;
-// end new code
 
+import mil.nga.giat.geowave.core.cli.api.DefaultOperation;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
@@ -25,14 +24,13 @@ import mil.nga.giat.geowave.core.cli.parser.ManualOperationParams;
 
 @GeowaveOperation(name = "cpindex", parentOperation = ConfigSection.class)
 @Parameters(commandDescription = "Copy and modify existing index configuration")
-public class CopyIndexCommand implements
+public class CopyIndexCommand extends
+		DefaultOperation implements
 		Command
 {
-	// new code
 	private static int SUCCESS = 0;
 	private static int USAGE_ERROR = -1;
 	private static int INDEX_EXISTS = -2;
-	// end new code
 
 	@Parameter(description = "<name> <new name>")
 	private List<String> parameters = new ArrayList<String>();
@@ -79,13 +77,13 @@ public class CopyIndexCommand implements
 	public void execute(
 			OperationParams params ) {
 
-		String result = computeResults(params);
+		// String result = computeResults(params);
+		copyIndex(params);
 
 	}
 
 	@Get("json")
-	public String computeResults(
-			OperationParams params ) {
+	public String computeResults() {
 		// TODO
 		String key = getQueryValue("key");
 		String value = getQueryValue("value");
@@ -98,10 +96,8 @@ public class CopyIndexCommand implements
 		setParameters(
 				key,
 				value);
-		// OperationParams params = new ManualOperationParams();
-		// TODO just adding this file information causes the config file to
-		// be stored as 'unknownversion-config.properties' which probably
-		// should change..
+		OperationParams params = new ManualOperationParams();
+
 		params.getContext().put(
 				ConfigOptions.PROPERTIES_FILE_CONTEXT,
 				ConfigOptions.getDefaultPropertyFile());
