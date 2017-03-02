@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
+import org.shaded.restlet.resource.Get;
+
+import mil.nga.giat.geowave.core.cli.api.DefaultOperation;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
@@ -16,12 +20,17 @@ import mil.nga.giat.geowave.core.cli.api.OperationParams;
 import mil.nga.giat.geowave.core.cli.operations.config.ConfigSection;
 import mil.nga.giat.geowave.core.cli.operations.config.options.ConfigOptions;
 import mil.nga.giat.geowave.core.store.operations.remote.options.IndexPluginOptions;
+import mil.nga.giat.geowave.core.cli.parser.ManualOperationParams;
 
 @GeowaveOperation(name = "cpindex", parentOperation = ConfigSection.class)
 @Parameters(commandDescription = "Copy and modify existing index configuration")
-public class CopyIndexCommand implements
+public class CopyIndexCommand extends
+		DefaultOperation implements
 		Command
 {
+	private static int SUCCESS = 0;
+	private static int USAGE_ERROR = -1;
+	private static int INDEX_EXISTS = -2;
 
 	@Parameter(description = "<name> <new name>")
 	private List<String> parameters = new ArrayList<String>();
@@ -68,22 +77,71 @@ public class CopyIndexCommand implements
 	public void execute(
 			OperationParams params ) {
 
+		// String result = computeResults(params);
+		copyIndex(params);
+
+	}
+
+	@Get("json")
+	public String computeResults() {
+		// TODO
+		String key = getQueryValue("key");
+		String value = getQueryValue("value");
+
+		if ((key == null || key.equals("")) || value == null) {
+			return "{ \"result\":" + USAGE_ERROR
+					+ ", \"message\":\"Must specify existing index and new index (comma separated)\",\"prev\":\"\"}";
+		}
+
+		setParameters(
+				key,
+				value);
+		OperationParams params = new ManualOperationParams();
+
+		params.getContext().put(
+				ConfigOptions.PROPERTIES_FILE_CONTEXT,
+				ConfigOptions.getDefaultPropertyFile());
+
+		Result result = copyIndex(params);
+
+		if (result.result == USAGE_ERROR) {
+			return "{ \"result\":" + USAGE_ERROR + ", \"message\":\"usage error\":\"" + "\"}";
+		}
+		else if (result.result == INDEX_EXISTS) {
+			return "{ \"result\":" + INDEX_EXISTS + ", \"message\":\"index exists error\",\"indexname\":\""
+					+ result.newIndex + "\"}";
+		}
+		else {
+			return "{ \"result\":" + SUCCESS + ", \"message\":\"\",\"indexname\":\"" + result.newIndex + "\"}";
+		}
+	}
+
+	/* TODO */
+	private Result copyIndex(
+			OperationParams params ) {
+		Result result = new Result();
+
 		if (parameters.size() < 2) {
-			throw new ParameterException(
-					"Must specify <existing index> <new index> names");
+			// throw new ParameterException(
+			// "Must specify <existing index> <new index> names");
+			result.result = USAGE_ERROR;
+			return result;
 		}
 
 		// This is the new index name.
 		String newIndex = parameters.get(1);
 		String newIndexNamespace = IndexPluginOptions.getIndexNamespace(newIndex);
+		result.newIndex = newIndex;
 
 		// Make sure we're not already in the index.
 		IndexPluginOptions existPlugin = new IndexPluginOptions();
 		if (existPlugin.load(
 				existingProps,
 				newIndexNamespace)) {
-			throw new ParameterException(
-					"That index already exists: " + newIndex);
+			// throw new ParameterException(
+			// "That index already exists: " + newIndex);
+			result.result = INDEX_EXISTS;
+			return result;
 		}
 
 		// Save the options.
@@ -103,6 +161,8 @@ public class CopyIndexCommand implements
 				configFile,
 				existingProps);
 
+		result.result = SUCCESS;
+		return result;
 	}
 
 	public List<String> getParameters() {
@@ -116,5 +176,13 @@ public class CopyIndexCommand implements
 		this.parameters.add(existingIndex);
 		this.parameters.add(newIndex);
 	}
+
+	// new code
+	private static class Result
+	{
+		int result;
+		String newIndex; // TODO update for this class
+	}
+	// end new code
 
 }
