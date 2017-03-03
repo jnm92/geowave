@@ -19,6 +19,7 @@ import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import mil.nga.giat.geowave.adapter.raster.util.ZipUtils;
 import mil.nga.giat.geowave.adapter.vector.FeatureDataAdapter;
 import mil.nga.giat.geowave.adapter.vector.stats.FeatureBoundingBoxStatistics;
 import mil.nga.giat.geowave.adapter.vector.stats.FeatureNumericRangeStatistics;
@@ -70,7 +71,7 @@ abstract public class AbstractGeoWaveBasicVectorIT
 	@BeforeClass
 	public static void extractTestFiles()
 			throws URISyntaxException {
-		TestUtils.unZipFile(
+		ZipUtils.unZipFile(
 				new File(
 						GeoWaveBasicSpatialVectorIT.class.getClassLoader().getResource(
 								TEST_DATA_ZIP_RESOURCE_PATH).toURI()),
@@ -327,7 +328,7 @@ abstract public class AbstractGeoWaveBasicVectorIT
 								FeatureNumericRangeStatistics.STATS_TYPE + "#") || expectedStat
 								.getStatisticsId()
 								.equals(
-										CountDataStatistics.STATS_ID))) {
+										CountDataStatistics.STATS_TYPE))) {
 							continue;
 						}
 					}
@@ -346,7 +347,7 @@ abstract public class AbstractGeoWaveBasicVectorIT
 						.getDataStatistics(
 								adapter.getAdapterId(),
 								FeatureBoundingBoxStatistics.composeId(adapter
-										.getType()
+										.getFeatureType()
 										.getGeometryDescriptor()
 										.getLocalName()));
 
@@ -397,7 +398,7 @@ abstract public class AbstractGeoWaveBasicVectorIT
 		// and compare results to what is available in the statistics data store
 		private StatisticsCache(
 				final StatisticsProvider<SimpleFeature> dataAdapter ) {
-			final ByteArrayId[] statsIds = dataAdapter.getSupportedStatisticsIds();
+			final ByteArrayId[] statsIds = dataAdapter.getSupportedStatisticsTypes();
 			for (final ByteArrayId statsId : statsIds) {
 				final DataStatistics<SimpleFeature> stats = dataAdapter.createDataStatistics(statsId);
 				statsCache.put(

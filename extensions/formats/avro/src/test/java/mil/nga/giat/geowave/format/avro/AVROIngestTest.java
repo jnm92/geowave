@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import mil.nga.giat.geowave.adapter.vector.avro.AvroSimpleFeatureCollection;
+
 import mil.nga.giat.geowave.adapter.vector.ingest.DataSchemaOptionProvider;
 import mil.nga.giat.geowave.core.index.ByteArrayId;
 import mil.nga.giat.geowave.core.index.StringUtils;
@@ -16,6 +17,7 @@ import mil.nga.giat.geowave.core.store.CloseableIterator;
 
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.specific.SpecificDatumReader;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
@@ -37,6 +39,7 @@ public class AVROIngestTest
 
 		filePath = "tornado_tracksbasicIT-export.avro";
 		expectedCount = 474;
+
 	}
 
 	@Test

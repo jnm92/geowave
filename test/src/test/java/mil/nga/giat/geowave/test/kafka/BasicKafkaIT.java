@@ -19,6 +19,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
+import mil.nga.giat.geowave.adapter.raster.util.ZipUtils;
 import mil.nga.giat.geowave.adapter.vector.FeatureDataAdapter;
 import mil.nga.giat.geowave.adapter.vector.stats.FeatureBoundingBoxStatistics;
 import mil.nga.giat.geowave.core.geotime.store.query.SpatialQuery;
@@ -75,7 +76,7 @@ public class BasicKafkaIT
 	@BeforeClass
 	public static void extractTestFiles()
 			throws URISyntaxException {
-		TestUtils.unZipFile(
+		ZipUtils.unZipFile(
 				new File(
 						BasicKafkaIT.class.getClassLoader().getResource(
 								TEST_DATA_ZIP_RESOURCE_PATH).toURI()),
@@ -124,13 +125,13 @@ public class BasicKafkaIT
 						.getDataStatistics(
 								adapter.getAdapterId(),
 								FeatureBoundingBoxStatistics.composeId(adapter
-										.getType()
+										.getFeatureType()
 										.getGeometryDescriptor()
 										.getLocalName()));
 				final CountDataStatistics<?> countStat = (CountDataStatistics<SimpleFeature>) statsStore
 						.getDataStatistics(
 								adapter.getAdapterId(),
-								CountDataStatistics.STATS_ID);
+								CountDataStatistics.STATS_TYPE);
 				// then query it
 				final GeometryFactory factory = new GeometryFactory();
 				final Envelope env = new Envelope(
