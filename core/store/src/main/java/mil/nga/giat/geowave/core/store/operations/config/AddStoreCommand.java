@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.shaded.restlet.data.Status;
+import org.shaded.restlet.resource.Post;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,7 @@ import mil.nga.giat.geowave.core.cli.api.Command;
 import mil.nga.giat.geowave.core.cli.api.OperationParams;
 import mil.nga.giat.geowave.core.cli.operations.config.ConfigSection;
 import mil.nga.giat.geowave.core.cli.operations.config.options.ConfigOptions;
+import mil.nga.giat.geowave.core.cli.parser.ManualOperationParams;
 import mil.nga.giat.geowave.core.store.operations.remote.options.DataStorePluginOptions;
 
 @GeowaveOperation(name = "addstore", parentOperation = ConfigSection.class)
@@ -92,6 +95,11 @@ public class AddStoreCommand implements
 	@Override
 	public void execute(
 			OperationParams params ) {
+		computeResults(params);
+	}
+	
+	public void computeResults(
+			OperationParams params ) {
 
 		File propFile = (File) params.getContext().get(
 				ConfigOptions.PROPERTIES_FILE_CONTEXT);
@@ -130,6 +138,25 @@ public class AddStoreCommand implements
 		ConfigOptions.writeProperties(
 				propFile,
 				existingProps);
+	}
+	
+	@Post("json")
+	public void restPost() {
+		String name = getQueryValue("name");
+		if (name == null) {
+			this.setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+			return;
+		}
+		parameters.add(name);
+		if (getQueryValue("default") != null) {
+			makeDefault = true;
+		}
+		
+		OperationParams params = new ManualOperationParams();
+		params.getContext().put(
+				ConfigOptions.PROPERTIES_FILE_CONTEXT,
+				ConfigOptions.getDefaultPropertyFile());
+		computeResults(params);
 	}
 
 	public DataStorePluginOptions getPluginOptions() {
