@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
-import org.restlet.resource.Get;
+import org.shaded.restlet.resource.Get;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
