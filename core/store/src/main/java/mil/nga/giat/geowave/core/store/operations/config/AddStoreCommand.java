@@ -17,6 +17,7 @@ import com.beust.jcommander.ParametersDelegate;
 
 import mil.nga.giat.geowave.core.cli.annotations.GeowaveOperation;
 import mil.nga.giat.geowave.core.cli.api.Command;
+import mil.nga.giat.geowave.core.cli.api.DefaultOperation;
 import mil.nga.giat.geowave.core.cli.api.OperationParams;
 import mil.nga.giat.geowave.core.cli.operations.config.ConfigSection;
 import mil.nga.giat.geowave.core.cli.operations.config.options.ConfigOptions;
@@ -25,7 +26,8 @@ import mil.nga.giat.geowave.core.store.operations.remote.options.DataStorePlugin
 
 @GeowaveOperation(name = "addstore", parentOperation = ConfigSection.class)
 @Parameters(commandDescription = "Create a store within Geowave")
-public class AddStoreCommand implements
+public class AddStoreCommand extends
+            DefaultOperation implements
 		Command
 {
 
@@ -97,7 +99,7 @@ public class AddStoreCommand implements
 			OperationParams params ) {
 		computeResults(params);
 	}
-	
+
 	public void computeResults(
 			OperationParams params ) {
 
@@ -139,7 +141,7 @@ public class AddStoreCommand implements
 				propFile,
 				existingProps);
 	}
-	
+
 	@Post("json")
 	public void restPost() {
 		String name = getQueryValue("name");
@@ -151,7 +153,7 @@ public class AddStoreCommand implements
 		if (getQueryValue("default") != null) {
 			makeDefault = true;
 		}
-		
+
 		OperationParams params = new ManualOperationParams();
 		params.getContext().put(
 				ConfigOptions.PROPERTIES_FILE_CONTEXT,
