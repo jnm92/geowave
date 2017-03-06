@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.shaded.restlet.data.Status;
+import org.shaded.restlet.resource.Post;
+
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
@@ -12,14 +15,17 @@ import com.beust.jcommander.ParametersDelegate;
 
 import mil.nga.giat.geowave.core.cli.annotations.GeowaveOperation;
 import mil.nga.giat.geowave.core.cli.api.Command;
+import mil.nga.giat.geowave.core.cli.api.DefaultOperation;
 import mil.nga.giat.geowave.core.cli.api.OperationParams;
 import mil.nga.giat.geowave.core.cli.operations.config.ConfigSection;
 import mil.nga.giat.geowave.core.cli.operations.config.options.ConfigOptions;
+import mil.nga.giat.geowave.core.cli.parser.ManualOperationParams;
 import mil.nga.giat.geowave.core.store.operations.remote.options.DataStorePluginOptions;
 
 @GeowaveOperation(name = "cpstore", parentOperation = ConfigSection.class)
 @Parameters(commandDescription = "Copy and modify existing store configuration")
-public class CopyStoreCommand implements
+public class CopyStoreCommand extends 
+            DefaultOperation implements
 		Command
 {
 
@@ -67,6 +73,11 @@ public class CopyStoreCommand implements
 	@Override
 	public void execute(
 			OperationParams params ) {
+		computeResults(params);
+	}
+
+	public void computeResults(
+			OperationParams params ) {
 
 		if (parameters.size() < 2) {
 			throw new ParameterException(
@@ -103,6 +114,32 @@ public class CopyStoreCommand implements
 				configFile,
 				existingProps);
 
+	}
+
+	@Post("json")
+	public void restPost() {
+		String name = getQueryValue("name");
+		if (name == null) {
+			this.setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+			return;
+		}
+		String newname = getQueryValue("new name");
+		if (newname == null) {
+			this.setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+			return;
+		}
+		parameters.add(name);
+		parameters.add(newname);
+		if (getQueryValue("default") != null) {
+			makeDefault = true;
+		}
+
+		OperationParams params = new ManualOperationParams();
+		params.getContext().put(
+				ConfigOptions.PROPERTIES_FILE_CONTEXT,
+				ConfigOptions.getDefaultPropertyFile());
+		prepare(params);
+		computeResults(params);
 	}
 
 	public List<String> getParameters() {
