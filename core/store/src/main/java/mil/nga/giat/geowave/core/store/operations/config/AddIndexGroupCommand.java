@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-// new code
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.resource.Get;
-//end new code
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
@@ -22,10 +20,7 @@ import mil.nga.giat.geowave.core.cli.operations.config.ConfigSection;
 import mil.nga.giat.geowave.core.cli.operations.config.options.ConfigOptions;
 import mil.nga.giat.geowave.core.store.operations.remote.options.IndexGroupPluginOptions;
 import mil.nga.giat.geowave.core.store.operations.remote.options.IndexPluginOptions;
-// new code
 import mil.nga.giat.geowave.core.cli.parser.ManualOperationParams;
-
-// end new code
 
 @GeowaveOperation(name = "addindexgrp", parentOperation = ConfigSection.class)
 @Parameters(commandDescription = "Create an index group for usage in GeoWave")
@@ -33,12 +28,10 @@ public class AddIndexGroupCommand extends
 		DefaultOperation implements
 		Command
 {
-	// new code
 	private static int SUCCESS = 0;
 	private static int USAGE_ERROR = -1;
 	private static int INDEXING_ERROR = -2;
 	private static int GROUP_EXISTS = -3;
-	// end new code
 
 	@Parameter(description = "<name> <comma separated list of indexes>")
 	private List<String> parameters = new ArrayList<String>();
@@ -46,18 +39,16 @@ public class AddIndexGroupCommand extends
 	@Override
 	public void execute(
 			OperationParams params ) {
-
 		// Result result = AddIndexGroup(params);
-		String resultMessage = computeResults(params);
-		// if (result.result == USAGE_ERROR) {
-		// throw new ParameterException(
-		// "Must specify index group name and index names (comma separated)");
-		// }
+		Result resultMessage = addIndexGroup(params);
+		if (resultMessage.result == USAGE_ERROR) {
+			throw new ParameterException(
+					"Must specify index group name and index names (comma separated)");
+		}
 	}
 
 	// TODO add post functionality?
 
-	// new code
 	/**
 	 * Add rest endpoint for the addIndexGroup command. Looks for GET params
 	 * with keys 'key' and 'value' to set.
@@ -66,11 +57,9 @@ public class AddIndexGroupCommand extends
 	 *         index group addition
 	 */
 	@Get("json")
-	public String computeResults(
-			OperationParams params ) {
+	public String computeResults() {
 		String key = getQueryValue("key");
 		String value = getQueryValue("value");
-
 		if ((key == null || key.equals("")) || value == null) {
 			return "{ \"result\":"
 					+ USAGE_ERROR
@@ -80,15 +69,12 @@ public class AddIndexGroupCommand extends
 		setParameters(
 				key,
 				value);
-		// OperationParams params = new ManualOperationParams();
-		// TODO just adding this file information causes the config file to
-		// be stored as 'unknownversion-config.properties' which probably
-		// should change..
+		OperationParams params = new ManualOperationParams();
 		params.getContext().put(
 				ConfigOptions.PROPERTIES_FILE_CONTEXT,
 				ConfigOptions.getDefaultPropertyFile());
 
-		Result result = AddIndexGroup(params);
+		Result result = addIndexGroup(params);
 
 		if (result.result == INDEXING_ERROR) {
 			return "{ \"result\":" + INDEXING_ERROR + ", \"message\":\"indexing error\",\"groupname\":\""
@@ -104,8 +90,12 @@ public class AddIndexGroupCommand extends
 
 	}
 
-	/* TODO create index group? */
-	private Result AddIndexGroup(
+	/**
+	 * Adds index group
+	 * 
+	 * @return result of operation (type of failure or success)
+	 */
+	private Result addIndexGroup(
 			OperationParams params ) {
 		Result result = new Result();
 		File propFile = (File) params.getContext().get(
@@ -169,8 +159,6 @@ public class AddIndexGroupCommand extends
 		return result;
 	}
 
-	// end new code
-
 	public String getPluginName() {
 		return parameters.get(0);
 	}
@@ -191,12 +179,10 @@ public class AddIndexGroupCommand extends
 		this.parameters.add(commaSeparatedIndexes);
 	}
 
-	// new code
 	private static class Result
 	{
 		int result;
 		String groupName;
 	}
-	// end new code
 
 }
