@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import org.shaded.restlet.data.Status;
 import org.shaded.restlet.resource.Post;
+import org.shaded.restlet.resource.ServerResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ import mil.nga.giat.geowave.core.cli.annotations.GeowaveOperation;
 import mil.nga.giat.geowave.core.cli.api.Command;
 import mil.nga.giat.geowave.core.cli.api.DefaultOperation;
 import mil.nga.giat.geowave.core.cli.api.OperationParams;
+//import mil.nga.giat.geowave.core.cli.api.ServerResource;
 import mil.nga.giat.geowave.core.cli.operations.config.ConfigSection;
 import mil.nga.giat.geowave.core.cli.operations.config.options.ConfigOptions;
 import mil.nga.giat.geowave.core.cli.parser.ManualOperationParams;
@@ -27,7 +29,7 @@ import mil.nga.giat.geowave.core.store.operations.remote.options.DataStorePlugin
 @GeowaveOperation(name = "addstore", parentOperation = ConfigSection.class)
 @Parameters(commandDescription = "Create a store within Geowave")
 public class AddStoreCommand extends
-            DefaultOperation implements
+		ServerResource implements
 		Command
 {
 

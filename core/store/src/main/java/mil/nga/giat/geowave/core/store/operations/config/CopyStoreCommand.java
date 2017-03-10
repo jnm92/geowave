@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import org.shaded.restlet.data.Status;
 import org.shaded.restlet.resource.Post;
+import org.shaded.restlet.resource.ServerResource;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
@@ -24,8 +25,8 @@ import mil.nga.giat.geowave.core.store.operations.remote.options.DataStorePlugin
 
 @GeowaveOperation(name = "cpstore", parentOperation = ConfigSection.class)
 @Parameters(commandDescription = "Copy and modify existing store configuration")
-public class CopyStoreCommand extends 
-            DefaultOperation implements
+public class CopyStoreCommand extends
+		ServerResource implements
 		Command
 {
 
