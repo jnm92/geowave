@@ -17,6 +17,7 @@ import mil.nga.giat.geowave.core.store.CloseableIterator;
 
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.specific.SpecificDatumReader;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
@@ -38,6 +39,7 @@ public class AVROIngestTest
 
 		filePath = "tornado_tracksbasicIT-export.avro";
 		expectedCount = 474;
+
 	}
 
 	@Test

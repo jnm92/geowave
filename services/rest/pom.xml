@@ -9,6 +9,16 @@
 	</parent>
 	<artifactId>geowave-service-rest</artifactId>
 	<name>GeoWave Services Rest</name>
+	<repositories>
+		<repository>
+			<id>maven-restlet</id>
+			<name>Restlet repository</name>
+			<url>https://maven.restlet.com</url>
+		</repository>
+	</repositories>
+	<properties>
+		<restlet-version>2.3.9</restlet-version>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>mil.nga.giat</groupId>
@@ -37,6 +47,7 @@
 			<groupId>mil.nga.giat</groupId>
 			<artifactId>geowave-service-rest-resources</artifactId>
 			<version>${project.version}</version>
+
 		</dependency>
 	</dependencies>
 </project>

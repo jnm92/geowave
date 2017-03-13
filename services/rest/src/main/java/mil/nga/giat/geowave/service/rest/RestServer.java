@@ -15,10 +15,12 @@ import org.shaded.restlet.resource.ServerResource;
 import org.shaded.restlet.routing.Router;
 import org.shaded.restlet.Restlet;
 
+
 public class RestServer extends
 		ServerResource
 {
 	private ArrayList<Route> availableRoutes;
+
 
 	/**
 	 * Run the Restlet server (localhost:5152)
@@ -74,6 +76,7 @@ public class RestServer extends
 		Application myApp = new Application() {
 			@Override
 			public Restlet createInboundRoot() {
+
 				router.setContext(getContext());
 				return router;
 			};
