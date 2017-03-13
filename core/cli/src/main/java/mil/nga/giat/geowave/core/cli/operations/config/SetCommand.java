@@ -7,6 +7,8 @@ import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.shaded.restlet.resource.Get;
+import org.shaded.restlet.resource.Post;
+import org.shaded.restlet.data.Status;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
@@ -50,22 +52,20 @@ public class SetCommand extends
 	 * @return string containing json with details of success or failure of the
 	 *         set
 	 */
-	@Get("json")
+	@Post("json")
 	public String computeResults() {
 		String key = getQueryValue("key");
 		String value = getQueryValue("value");
 
 		if ((key == null || key.equals("")) || value == null) {
-			return "{ \"result\":" + USAGE_ERROR + ", \"message\":\"requires get params key,value\",\"prev\":\"\"}";
+			this.setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "Requires: <name> <value>");
+			return null;
 		}
 
 		setParameters(
 				key,
 				value);
 		OperationParams params = new ManualOperationParams();
-		// TODO just adding this file information causes the config file to
-		// be stored as 'unknownversion-config.properties' which probably
-		// should change..
 		params.getContext().put(
 				ConfigOptions.PROPERTIES_FILE_CONTEXT,
 				ConfigOptions.getDefaultPropertyFile());
@@ -112,9 +112,7 @@ public class SetCommand extends
 			value = parameters.get(1);
 		}
 		else {
-			result.result = USAGE_ERROR;
-			return result;
-
+			throw new ParameterException("Requires: <name> <value>");
 		}
 
 		result.previousValue = p.setProperty(
