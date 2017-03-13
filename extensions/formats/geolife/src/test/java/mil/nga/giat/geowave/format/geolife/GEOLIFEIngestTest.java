@@ -69,7 +69,7 @@ public class GEOLIFEIngestTest
 		if (!readExpectedCount) {
 			System.out.println("Expected " + expectedCount + " features, ingested " + featureCount);
 		}
-		
+
 		assertTrue(readExpectedCount);
 	}
 
