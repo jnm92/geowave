@@ -38,11 +38,7 @@ public class SetCommand extends
 	@Override
 	public void execute(
 			OperationParams params ) {
-		Result result = setKeyValue(params);
-		if (result.result == USAGE_ERROR) {
-			throw new ParameterException(
-					"Requires: <name> <value>");
-		}
+		setKeyValue(params);
 	}
 
 	/**
@@ -53,7 +49,7 @@ public class SetCommand extends
 	 *         set
 	 */
 	@Post("json")
-	public String computeResults() {
+	public Object computeResults() {
 		String key = getQueryValue("key");
 		String value = getQueryValue("value");
 
@@ -69,26 +65,21 @@ public class SetCommand extends
 		params.getContext().put(
 				ConfigOptions.PROPERTIES_FILE_CONTEXT,
 				ConfigOptions.getDefaultPropertyFile());
-
-		Result result = setKeyValue(params);
-
-		if (result.result == WRITE_FAILURE) {
-			return "{ \"result\":" + WRITE_FAILURE + ", \"message\":\"write failure\",\"prev\":\""
-					+ result.previousValue + "\"}";
+		
+		try {
+			return setKeyValue(params);
+		} catch (WritePropertiesException | ParameterException e) {
+			this.setStatus(Status.SERVER_ERROR_INTERNAL, e.getMessage());
+			return null;
 		}
-		else {
-			return "{ \"result\":" + SUCCESS + ", \"message\":\"\",\"prev\":\"" + result.previousValue + "\"}";
-		}
-
 	}
 
 	/**
 	 * Set the key value pair in the config. Store the previous value of the key
 	 * in prevValue
 	 */
-	private Result setKeyValue(
+	private Object setKeyValue(
 			OperationParams params ) {
-		Result result = new Result();
 
 		File f = (File) params.getContext().get(
 				ConfigOptions.PROPERTIES_FILE_CONTEXT);
@@ -115,18 +106,16 @@ public class SetCommand extends
 			throw new ParameterException("Requires: <name> <value>");
 		}
 
-		result.previousValue = p.setProperty(
+		Object previousValue = p.setProperty(
 				key,
 				value);
 		if (!ConfigOptions.writeProperties(
 				f,
 				p)) {
-			result.result = WRITE_FAILURE;
-			return result;
+			throw new WritePropertiesException("Write failure");
 		}
 		else {
-			result.result = SUCCESS;
-			return result;
+			return previousValue;
 		}
 	}
 
@@ -146,5 +135,13 @@ public class SetCommand extends
 	{
 		int result;
 		Object previousValue;
+	}
+	
+	class WritePropertiesException extends RuntimeException {
+
+		public WritePropertiesException(String string) {
+			super(string);
+		}
+		
 	}
 }
