@@ -54,7 +54,9 @@ public class SetCommand extends
 		String value = getQueryValue("value");
 
 		if ((key == null || key.equals("")) || value == null) {
-			this.setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "Requires: <name> <value>");
+			this.setStatus(
+					Status.CLIENT_ERROR_BAD_REQUEST,
+					"Requires: <name> <value>");
 			return null;
 		}
 
@@ -65,11 +67,14 @@ public class SetCommand extends
 		params.getContext().put(
 				ConfigOptions.PROPERTIES_FILE_CONTEXT,
 				ConfigOptions.getDefaultPropertyFile());
-		
+
 		try {
 			return setKeyValue(params);
-		} catch (WritePropertiesException | ParameterException e) {
-			this.setStatus(Status.SERVER_ERROR_INTERNAL, e.getMessage());
+		}
+		catch (WritePropertiesException | ParameterException e) {
+			this.setStatus(
+					Status.SERVER_ERROR_INTERNAL,
+					e.getMessage());
 			return null;
 		}
 	}
@@ -103,7 +108,8 @@ public class SetCommand extends
 			value = parameters.get(1);
 		}
 		else {
-			throw new ParameterException("Requires: <name> <value>");
+			throw new ParameterException(
+					"Requires: <name> <value>");
 		}
 
 		Object previousValue = p.setProperty(
@@ -112,7 +118,8 @@ public class SetCommand extends
 		if (!ConfigOptions.writeProperties(
 				f,
 				p)) {
-			throw new WritePropertiesException("Write failure");
+			throw new WritePropertiesException(
+					"Write failure");
 		}
 		else {
 			return previousValue;
@@ -131,17 +138,15 @@ public class SetCommand extends
 		this.parameters.add(value);
 	}
 
-	private static class Result
+	private static class WritePropertiesException extends
+			RuntimeException
 	{
-		int result;
-		Object previousValue;
-	}
-	
-	class WritePropertiesException extends RuntimeException {
 
-		public WritePropertiesException(String string) {
-			super(string);
+		private WritePropertiesException(
+				String string ) {
+			super(
+					string);
 		}
-		
+
 	}
 }
