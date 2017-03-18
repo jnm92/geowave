@@ -76,6 +76,7 @@ public class IndexLoader
 				loadedIndices.putAll(indexGroupOptions.getDimensionalityPlugins());
 			}
 		}
+
 		return loadedIndices.size() != 0;
 	}
 

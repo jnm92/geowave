@@ -116,7 +116,11 @@ public class CopyIndexCommand extends
 		}
 	}
 
-	/* TODO */
+	/**
+	 * copies index
+	 * 
+	 * @return none
+	 */
 	private void copyIndex(
 			OperationParams params ) {
 

@@ -48,8 +48,7 @@ public class AddIndexGroupCommand extends
 	 * Add rest endpoint for the addIndexGroup command. Looks for POST params
 	 * with keys 'key' and 'value' to set.
 	 * 
-	 * @return string containing json with details of success or failure of the
-	 *         index group addition
+	 * @return none
 	 */
 	@Post("json")
 	public void computeResults() { //TODO think about return type
@@ -83,10 +82,10 @@ public class AddIndexGroupCommand extends
 
 	/**
 	 * Adds index group
-	 * 
-	 * @return result of operation (type of failure or success)
+	 * @parameters params
+	 * @return none
 	 */
-	private void addIndexGroup( //TODO think about return type
+	private void addIndexGroup(
 			OperationParams params ) {
 		File propFile = (File) params.getContext().get(
 				ConfigOptions.PROPERTIES_FILE_CONTEXT);
