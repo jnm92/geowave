@@ -21,6 +21,8 @@ import mil.nga.giat.geowave.core.cli.api.OperationParams;
 import mil.nga.giat.geowave.core.cli.operations.config.ConfigSection;
 import mil.nga.giat.geowave.core.cli.operations.config.options.ConfigOptions;
 import mil.nga.giat.geowave.core.cli.parser.ManualOperationParams;
+import mil.nga.giat.geowave.core.store.GeoWaveStoreFinder;
+import mil.nga.giat.geowave.core.store.memory.MemoryStoreFactoryFamily;
 import mil.nga.giat.geowave.core.store.operations.remote.options.DataStorePluginOptions;
 
 @GeowaveOperation(name = "cpstore", parentOperation = ConfigSection.class)
@@ -124,7 +126,7 @@ public class CopyStoreCommand extends
 			this.setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 			return;
 		}
-		String newname = getQueryValue("new name");
+		String newname = getQueryValue("newname");
 		if (newname == null) {
 			this.setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 			return;
@@ -134,6 +136,11 @@ public class CopyStoreCommand extends
 		if (getQueryValue("default") != null) {
 			makeDefault = true;
 		}
+
+		GeoWaveStoreFinder.getRegisteredStoreFactoryFamilies().put(
+				newname,
+				new MemoryStoreFactoryFamily());
+		
 
 		OperationParams params = new ManualOperationParams();
 		params.getContext().put(

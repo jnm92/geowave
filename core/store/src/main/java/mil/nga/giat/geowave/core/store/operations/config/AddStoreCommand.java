@@ -24,6 +24,9 @@ import mil.nga.giat.geowave.core.cli.api.OperationParams;
 import mil.nga.giat.geowave.core.cli.operations.config.ConfigSection;
 import mil.nga.giat.geowave.core.cli.operations.config.options.ConfigOptions;
 import mil.nga.giat.geowave.core.cli.parser.ManualOperationParams;
+import mil.nga.giat.geowave.core.store.GeoWaveStoreFinder;
+import mil.nga.giat.geowave.core.store.memory.MemoryRequiredOptions;
+import mil.nga.giat.geowave.core.store.memory.MemoryStoreFactoryFamily;
 import mil.nga.giat.geowave.core.store.operations.remote.options.DataStorePluginOptions;
 
 @GeowaveOperation(name = "addstore", parentOperation = ConfigSection.class)
@@ -146,20 +149,30 @@ public class AddStoreCommand extends
 
 	@Post("json")
 	public void restPost() {
+
 		String name = getQueryValue("name");
 		if (name == null) {
 			this.setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 			return;
 		}
 		parameters.add(name);
+		storeType = name;
 		if (getQueryValue("default") != null) {
 			makeDefault = true;
 		}
+
+		GeoWaveStoreFinder.getRegisteredStoreFactoryFamilies().put(
+				name,
+				new MemoryStoreFactoryFamily());
 
 		OperationParams params = new ManualOperationParams();
 		params.getContext().put(
 				ConfigOptions.PROPERTIES_FILE_CONTEXT,
 				ConfigOptions.getDefaultPropertyFile());
+
+		prepare(params);
+		final MemoryRequiredOptions opts = (MemoryRequiredOptions) pluginOptions.getFactoryOptions();
+		opts.setGeowaveNamespace("namespace");
 		computeResults(params);
 	}
 
