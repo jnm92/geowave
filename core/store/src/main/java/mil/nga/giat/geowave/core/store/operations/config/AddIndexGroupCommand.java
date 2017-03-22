@@ -81,6 +81,7 @@ public class AddIndexGroupCommand extends
 		}
 	}
 
+
 	/**
 	 * Adds index group
 	 * 
@@ -101,6 +102,7 @@ public class AddIndexGroupCommand extends
 
 		// New index group name
 		String newGroupName = parameters.get(0);
+		result.groupName = newGroupName;
 		String[] indexes = parameters.get(
 				1).split(
 				",");

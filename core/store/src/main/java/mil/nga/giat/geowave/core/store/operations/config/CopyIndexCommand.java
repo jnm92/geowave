@@ -86,7 +86,6 @@ public class CopyIndexCommand extends
 
 	@Post("json")
 	public void computeResults() {
-		
 		String key = getQueryValue("key");
 		String value = getQueryValue("value");
 
