@@ -5,8 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import mil.nga.giat.geowave.core.cli.api.Operation;
+import mil.nga.giat.geowave.core.cli.parser.ManualOperationParams;
+import org.shaded.restlet.resource.Get;
+import org.shaded.restlet.data.Status;
+import org.shaded.restlet.resource.Post;
+import org.shaded.restlet.resource.ServerResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import mil.nga.giat.geowave.core.cli.api.DefaultOperation;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
@@ -22,13 +29,14 @@ import mil.nga.giat.geowave.core.store.operations.remote.options.IndexPluginOpti
 
 @GeowaveOperation(name = "addindex", parentOperation = ConfigSection.class)
 @Parameters(commandDescription = "Configure an index for usage in GeoWave")
-public class AddIndexCommand implements
+public class AddIndexCommand extends
+		ServerResource implements
 		Command
 {
 	private final static Logger LOGGER = LoggerFactory.getLogger(AddIndexCommand.class);
 
 	@Parameter(description = "<name>", required = true)
-	private List<String> parameters = new ArrayList<String>();
+	private List<String> parameters = new ArrayList<>();
 
 	@Parameter(names = {
 		"-d",
@@ -88,6 +96,54 @@ public class AddIndexCommand implements
 
 	@Override
 	public void execute(
+			OperationParams params ) {
+		computeResults(params);
+
+	}
+
+	@Get
+	public void restGet() {
+		this.setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+		return;
+	}
+
+	@Post("json")
+	public void restPost() {
+
+		// from this class
+		makeDefault = getQueryValue("default") == "true";
+		type = getQueryValue("type");
+		String name = getQueryValue("name");
+		if (name == null) {
+			this.setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+			return;
+		}
+		parameters.add(name);
+
+		// from IndexPluginOptions
+		String numPartitions = getQueryValue("numPartitions");
+		String partitionStrategy = getQueryValue("partitionStrategy");
+
+		OperationParams params = new ManualOperationParams();
+
+		params.getContext().put(
+				"name",
+				name);
+		params.getContext().put(
+				"numPartitions",
+				numPartitions);
+		params.getContext().put(
+				"partitionStrategy",
+				partitionStrategy);
+		params.getContext().put(
+				ConfigOptions.PROPERTIES_FILE_CONTEXT,
+				ConfigOptions.getDefaultPropertyFile());
+
+		prepare(params);
+		computeResults(params);
+	}
+
+	private void computeResults(
 			OperationParams params ) {
 
 		// Ensure that a name is chosen.
