@@ -73,6 +73,8 @@ public class IndexPluginOptions extends
 		indexType = qualifier;
 		if (qualifier != null) {
 			indexPlugin = DimensionalityTypeRegistry.getSelectedDimensionalityProvider(qualifier);
+			System.out.println("indexPlugin: " + indexPlugin);
+
 			if (indexPlugin == null) {
 				throw new ParameterException(
 						"Unknown index type specified");
@@ -90,16 +92,33 @@ public class IndexPluginOptions extends
 		return indexType;
 	}
 
+	// public void setType(String type) { this.indexType = type; }
+
 	public int getNumPartitions() {
 		return numPartitions;
+	}
+
+	public void setNumPartitions(
+			int numPartitions ) {
+		this.numPartitions = numPartitions;
 	}
 
 	public String getNameOverride() {
 		return nameOverride;
 	}
 
+	public void setNameOverride(
+			String nameOverride ) {
+		this.nameOverride = nameOverride;
+	}
+
 	public PartitionStrategy getPartitionStrategy() {
 		return partitionStrategy;
+	}
+
+	public void setPartitionStrategy(
+			PartitionStrategy partitionStrategy ) {
+		this.partitionStrategy = partitionStrategy;
 	}
 
 	public DimensionalityTypeProviderSpi getIndexPlugin() {

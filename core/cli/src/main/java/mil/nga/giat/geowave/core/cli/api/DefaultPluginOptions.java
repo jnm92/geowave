@@ -35,16 +35,30 @@ public abstract class DefaultPluginOptions
 	public void save(
 			Properties properties,
 			String namespace ) {
+
+		System.out.println("ASDF");
+
 		JCommanderPropertiesTransformer jcpt = new JCommanderPropertiesTransformer(
 				String.format(
 						"%s.opts",
 						namespace));
+
+		System.out.println(jcpt);
+
+		System.out.println("KK");
+
 		jcpt.addObject(this);
 		jcpt.transformToProperties(properties);
 		// Add the entry for the type property.
 		String typeProperty = String.format(
 				"%s.type",
 				namespace);
+
+		System.out.println("HI");
+
+		System.out.println(typeProperty);
+		System.out.println(getType());
+
 		properties.setProperty(
 				typeProperty,
 				getType());

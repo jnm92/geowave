@@ -57,12 +57,16 @@ public class AddIndexCommand extends
 	public boolean prepare(
 			OperationParams params ) {
 
+		System.out.println("Prepare1");
 		// Load SPI options for the given type into pluginOptions.
 		if (type != null) {
+			System.out.println("Type given");
 			pluginOptions.selectPlugin(type);
 		}
 		else {
 			// Try to load the 'default' options.
+
+			System.out.println("No type given");
 
 			File configFile = (File) params.getContext().get(
 					ConfigOptions.PROPERTIES_FILE_CONTEXT);
@@ -71,6 +75,8 @@ public class AddIndexCommand extends
 					null);
 
 			String defaultIndex = existingProps.getProperty(IndexPluginOptions.DEFAULT_PROPERTY_NAMESPACE);
+
+			System.out.println("defaultIndex: " + defaultIndex);
 
 			// Load the default index.
 			if (defaultIndex != null) {
@@ -90,6 +96,8 @@ public class AddIndexCommand extends
 			}
 		}
 
+		System.out.println("Prepare2");
+
 		// Successfully prepared.
 		return true;
 	}
@@ -101,40 +109,41 @@ public class AddIndexCommand extends
 
 	}
 
-	@Get
-	public void restGet() {
-		this.setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-		return;
-	}
+	boolean servingHTTP = false;
 
 	@Post("json")
 	public void restPost() {
+		this.servingHTTP = true;
 
 		// from this class
 		makeDefault = getQueryValue("default") == "true";
-		type = getQueryValue("type");
 		String name = getQueryValue("name");
-		if (name == null) {
-			this.setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-			return;
-		}
-		parameters.add(name);
+		this.setType(getQueryValue("type"));
+
+		if (name != null) parameters.add(name);
+
+		System.out.println("Set name to " + name);
+		System.out.println("Set type to " + this.getType());
 
 		// from IndexPluginOptions
-		String numPartitions = getQueryValue("numPartitions");
-		String partitionStrategy = getQueryValue("partitionStrategy");
+		Integer numPartitions = Integer.getInteger(getQueryValue("setNumPartitions"));
+		if (numPartitions != null) pluginOptions.setNumPartitions(numPartitions);
+
+		// String ps = getQueryValue(
+		// "partitionStrategy").toLowerCase();
+		// IndexPluginOptions.PartitionStrategy partitionStrategy =
+		// ("none".equals(ps)) ? IndexPluginOptions.PartitionStrategy.NONE
+		// : ("hash".equals(ps)) ? IndexPluginOptions.PartitionStrategy.HASH
+		// : ("round_robin".equals(ps)) ?
+		// IndexPluginOptions.PartitionStrategy.ROUND_ROBIN : null;
+
+		// if (partitionStrategy != null)
+		// pluginOptions.setPartitionStrategy(partitionStrategy);
+
+		// todo, name override and the delegates of pluginOptions
 
 		OperationParams params = new ManualOperationParams();
 
-		params.getContext().put(
-				"name",
-				name);
-		params.getContext().put(
-				"numPartitions",
-				numPartitions);
-		params.getContext().put(
-				"partitionStrategy",
-				partitionStrategy);
 		params.getContext().put(
 				ConfigOptions.PROPERTIES_FILE_CONTEXT,
 				ConfigOptions.getDefaultPropertyFile());
@@ -147,16 +156,33 @@ public class AddIndexCommand extends
 			OperationParams params ) {
 
 		// Ensure that a name is chosen.
-		if (parameters.size() != 1) {
+		if (this.getParameters().size() != 1) {
+			this.setStatus(
+					Status.CLIENT_ERROR_BAD_REQUEST,
+					"Missing name");
+			if (servingHTTP) return;
 			throw new ParameterException(
 					"Must specify index name");
 		}
+
+		if (this.getType() == null) {
+			this.setStatus(
+					Status.CLIENT_ERROR_BAD_REQUEST,
+					"Cant infer type");
+			if (servingHTTP) return;
+			throw new ParameterException(
+					"No type could be infered");
+		}
+
+		System.out.println("1");
 
 		File propFile = (File) params.getContext().get(
 				ConfigOptions.PROPERTIES_FILE_CONTEXT);
 		Properties existingProps = ConfigOptions.loadProperties(
 				propFile,
 				null);
+
+		System.out.println("2");
 
 		// Make sure we're not already in the index.
 		IndexPluginOptions existPlugin = new IndexPluginOptions();
@@ -167,17 +193,39 @@ public class AddIndexCommand extends
 					"That index already exists: " + getPluginName());
 		}
 
+		System.out.println("3");
+
+		String namespace = getNamespace();
+		System.out.println("HERE1");
+		System.out.println(namespace);
+		System.out.println(pluginOptions);
+		System.out.println("CALLING");
+
+		// try {
 		// Save the options.
-		pluginOptions.save(
+		this.getPluginOptions().save(
 				existingProps,
-				getNamespace());
+				namespace);
+		// }
+		// catch (Exception e) {
+		// System.out.println(e);
+		// }
+
+		System.out.println("HERE2");
 
 		// Make default?
 		if (Boolean.TRUE.equals(makeDefault)) {
+			System.out.println("HERE5");
+
 			existingProps.setProperty(
 					IndexPluginOptions.DEFAULT_PROPERTY_NAMESPACE,
 					getPluginName());
+			System.out.println("HERE4");
+
 		}
+		System.out.println("HERE3");
+
+		System.out.println("LOMO");
 
 		// Write properties file
 		ConfigOptions.writeProperties(
