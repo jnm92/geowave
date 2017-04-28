@@ -104,12 +104,12 @@ public class CopyIndexCommand extends
 	@Override
 	public void readFormArgs(
 			Form form ) {
-		String key = form.getFirstValue("key");
-		String value = form.getFirstValue("value");
+		String name = form.getFirstValue("name");
+		String newname = form.getFirstValue("newname");
 
 		setParameters(
-				key,
-				value);
+				name,
+				newname);
 	}
 
 	/**
