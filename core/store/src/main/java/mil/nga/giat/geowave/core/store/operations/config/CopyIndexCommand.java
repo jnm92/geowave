@@ -101,17 +101,6 @@ public class CopyIndexCommand extends
 		return null;
 	}
 
-	@Override
-	public void readFormArgs(
-			Form form ) {
-		String name = form.getFirstValue("name");
-		String newname = form.getFirstValue("newname");
-
-		setParameters(
-				name,
-				newname);
-	}
-
 	/**
 	 * copies index
 	 * 

@@ -250,7 +250,6 @@ public class RestServerTest
 	}
 
 	// Tests geowave/config/addindex, cpindex, rmindex
-	// @Ignore("Kevin will fix addindex")
 	@Test
 	public void geowave_config_index()
 			throws ResourceException,

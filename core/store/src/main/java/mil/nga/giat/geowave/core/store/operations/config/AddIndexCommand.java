@@ -148,30 +148,6 @@ public class AddIndexCommand extends
 	}
 
 	@Override
-	public void readFormArgs(
-			Form form ) {
-
-		String name = form.getFirstValue("name");
-		String type = form.getFirstValue("type");
-		String isdefault = form.getFirstValue("default");
-
-		if (isdefault != null && isdefault.equals("true")) {
-			this.setMakeDefault(true);
-		}
-
-		if (name == null || type == null) {
-			this.setStatus(
-					Status.CLIENT_ERROR_BAD_REQUEST,
-					"Requires: name and type");
-			return;
-		}
-
-		this.getParameters().add(
-				name);
-		this.setType(type);
-	}
-
-	@Override
 	protected Void computeResults(
 			OperationParams params ) {
 
