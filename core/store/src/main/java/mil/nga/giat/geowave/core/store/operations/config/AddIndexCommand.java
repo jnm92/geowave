@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import mil.nga.giat.geowave.core.cli.annotations.RestParameters;
 import mil.nga.giat.geowave.core.cli.api.Operation;
 import mil.nga.giat.geowave.core.cli.parser.ManualOperationParams;
 import org.shaded.restlet.data.Form;
@@ -38,6 +39,9 @@ public class AddIndexCommand extends
 	private final static Logger LOGGER = LoggerFactory.getLogger(AddIndexCommand.class);
 
 	@Parameter(description = "<name>", required = true)
+	@RestParameters(names = {
+		"name"
+	})
 	private List<String> parameters = new ArrayList<String>();
 
 	@Parameter(names = {

@@ -317,7 +317,7 @@ public class RestServerTest
 				"password");
 		Form formRm = new Form();
 		formRm.add(
-				"pattern",
+				"name",
 				"index1");
 		formRm.add(
 				"config_file",
@@ -328,7 +328,7 @@ public class RestServerTest
 
 		formRm.remove(0);
 		formRm.add(
-				"pattern",
+				"name",
 				"index2");
 		resourceRm.post(
 				formRm).write(
