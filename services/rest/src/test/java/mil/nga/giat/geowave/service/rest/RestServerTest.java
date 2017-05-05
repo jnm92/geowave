@@ -344,4 +344,63 @@ public class RestServerTest
 
 		fail("No exception was thrown");
 	}
+
+	// Tests geowave/config/set and list
+	@Test
+	public void geowave_ingest()
+			throws IOException,
+			ResourceException,
+			ParseException {
+
+		File configFile = tempFolder.newFile("test_config");
+
+		// create a new store named "store1", with type "memory"
+		ClientResource resourceAdd = new ClientResource(
+				"http://localhost:5152/geowave/config/addstore");
+		resourceAdd.setChallengeResponse(
+				ChallengeScheme.HTTP_BASIC,
+				"admin",
+				"password");
+		Form formAdd = new Form();
+		formAdd.add(
+				"name",
+				"store1");
+		formAdd.add(
+				"storeType",
+				"memory");
+		formAdd.add(
+				"default",
+				"false");
+		formAdd.add(
+				"config_file",
+				configFile.getAbsolutePath());
+		resourceAdd.post(
+				formAdd).write(
+				System.out);
+
+		// create a new store named "store1", with type "memory"
+		ClientResource resourceIngest = new ClientResource(
+				"http://localhost:5152/geowave/ingest/localToGW");
+		resourceIngest.setChallengeResponse(
+				ChallengeScheme.HTTP_BASIC,
+				"admin",
+				"password");
+		Form formIngest = new Form();
+		formIngest.add(
+				"path",
+				"geowave/test/src/test/resources/mil/nga/giat/geowave/test/basic-testdata.zip");
+		formIngest.add(
+				"storename",
+				"store1");
+		formIngest.add(
+				"indices",
+				"");
+		formIngest.add(
+				"config_file",
+				configFile.getAbsolutePath());
+		resourceIngest.post(
+				formIngest).write(
+				System.out);
+
+	}
 }
