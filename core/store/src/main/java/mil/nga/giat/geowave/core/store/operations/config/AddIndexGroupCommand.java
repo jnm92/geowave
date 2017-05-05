@@ -40,8 +40,8 @@ public class AddIndexGroupCommand extends
 
 	@Parameter(description = "<name> <comma separated list of indexes>")
 	@RestParameters(names = {
-		"key",
-		"value"
+		"name",
+		"names"
 	})
 	private List<String> parameters = new ArrayList<String>();
 
@@ -91,6 +91,8 @@ public class AddIndexGroupCommand extends
 			throw new ParameterException(
 					"Must specify index group name and index names (comma separated)");
 		}
+
+		System.out.println(parameters);
 
 		// New index group name
 		String newGroupName = parameters.get(0);
