@@ -92,8 +92,6 @@ public class AddIndexGroupCommand extends
 					"Must specify index group name and index names (comma separated)");
 		}
 
-		System.out.println(parameters);
-
 		// New index group name
 		String newGroupName = parameters.get(0);
 		String[] indexes = parameters.get(

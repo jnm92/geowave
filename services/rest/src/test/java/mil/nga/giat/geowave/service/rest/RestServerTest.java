@@ -357,7 +357,6 @@ public class RestServerTest
 	}
 
 	// Tests geowave/config/addindexgrp, rmindexgrp
-	// @Ignore("indexgrp can only be added when index is added")
 	@Test
 	public void geowave_config_indexgrp()
 			throws ResourceException,
