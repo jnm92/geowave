@@ -474,6 +474,29 @@ public class RestServerTest
 				formAdd).write(
 				System.out);
 
+		ClientResource resourceIndex = new ClientResource(
+				"http://localhost:5152/geowave/config/addindex");
+		resourceIndex.setChallengeResponse(
+				ChallengeScheme.HTTP_BASIC,
+				"admin",
+				"password");
+		Form formIndex = new Form();
+		formIndex.add(
+				"name",
+				"index1");
+		formIndex.add(
+				"type",
+				"spatial");
+		formIndex.add(
+				"default",
+				"true");
+		formIndex.add(
+				"config_file",
+				configFile.getAbsolutePath());
+		resourceIndex.post(
+				formAdd).write(
+				System.out);
+
 		// create a new store named "store1", with type "memory"
 		ClientResource resourceIngest = new ClientResource(
 				"http://localhost:5152/geowave/ingest/localToGW");
@@ -490,7 +513,7 @@ public class RestServerTest
 				"store1");
 		formIngest.add(
 				"indices",
-				"");
+				"index1");
 		formIngest.add(
 				"config_file",
 				configFile.getAbsolutePath());
