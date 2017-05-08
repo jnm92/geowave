@@ -30,9 +30,12 @@ import org.shaded.restlet.data.MediaType;
 import org.shaded.restlet.data.Method;
 import org.shaded.restlet.data.Protocol;
 import org.shaded.restlet.data.Status;
+import org.shaded.restlet.representation.FileRepresentation;
 import org.shaded.restlet.representation.Representation;
 import org.shaded.restlet.resource.ClientResource;
 import org.shaded.restlet.resource.Resource;
+import org.shaded.restlet.ext.html.FormDataSet;
+import org.shaded.restlet.ext.html.FormData;
 
 import java.io.File;
 import java.io.IOException;
@@ -441,7 +444,7 @@ public class RestServerTest
 		fail("No exception was thrown");
 	}
 
-	// Tests geowave/config/set and list
+	// Test ingesting data into a newly created store with spatial index
 	@Test
 	public void geowave_ingest()
 			throws IOException,
@@ -474,6 +477,7 @@ public class RestServerTest
 				formAdd).write(
 				System.out);
 
+		// create index
 		ClientResource resourceIndex = new ClientResource(
 				"http://localhost:5152/geowave/config/addindex");
 		resourceIndex.setChallengeResponse(
@@ -494,10 +498,10 @@ public class RestServerTest
 				"config_file",
 				configFile.getAbsolutePath());
 		resourceIndex.post(
-				formAdd).write(
+				formIndex).write(
 				System.out);
 
-		// create a new store named "store1", with type "memory"
+		// ingest data into store with index
 		ClientResource resourceIngest = new ClientResource(
 				"http://localhost:5152/geowave/ingest/localToGW");
 		resourceIngest.setChallengeResponse(
@@ -507,7 +511,124 @@ public class RestServerTest
 		Form formIngest = new Form();
 		formIngest.add(
 				"path",
-				"geowave/test/src/test/resources/mil/nga/giat/geowave/test/basic-testdata.zip");
+				"../../test/src/test/resources/mil/nga/giat/geowave/test/basic-testdata.zip");
+		formIngest.add(
+				"storename",
+				"store1");
+		formIngest.add(
+				"indices",
+				"index1");
+		formIngest.add(
+				"config_file",
+				configFile.getAbsolutePath());
+		resourceIngest.post(
+				formIngest).write(
+				System.out);
+
+	}
+
+	// Test uploading then ingesting data into a newly created store with
+	// spatial index
+	@Test
+	public void geowave_upload_and_ingest()
+			throws IOException,
+			ResourceException,
+			ParseException {
+
+		File configFile = tempFolder.newFile("test_config");
+
+		// create a new store named "store1", with type "memory"
+		ClientResource resourceAdd = new ClientResource(
+				"http://localhost:5152/geowave/config/addstore");
+		resourceAdd.setChallengeResponse(
+				ChallengeScheme.HTTP_BASIC,
+				"admin",
+				"password");
+		Form formAdd = new Form();
+		formAdd.add(
+				"name",
+				"store1");
+		formAdd.add(
+				"storeType",
+				"memory");
+		formAdd.add(
+				"default",
+				"false");
+		formAdd.add(
+				"config_file",
+				configFile.getAbsolutePath());
+		resourceAdd.post(
+				formAdd).write(
+				System.out);
+
+		// create index
+		ClientResource resourceIndex = new ClientResource(
+				"http://localhost:5152/geowave/config/addindex");
+		resourceIndex.setChallengeResponse(
+				ChallengeScheme.HTTP_BASIC,
+				"admin",
+				"password");
+		Form formIndex = new Form();
+		formIndex.add(
+				"name",
+				"index1");
+		formIndex.add(
+				"type",
+				"spatial");
+		formIndex.add(
+				"default",
+				"true");
+		formIndex.add(
+				"config_file",
+				configFile.getAbsolutePath());
+		resourceIndex.post(
+				formIndex).write(
+				System.out);
+
+		ClientResource resourceUpload = new ClientResource(
+				"http://localhost:5152/fileupload");
+		resourceUpload.setChallengeResponse(
+				ChallengeScheme.HTTP_BASIC,
+				"admin",
+				"password");
+
+		File file = new File(
+				"../../test/src/test/resources/mil/nga/giat/geowave/test/basic-testdata.zip");
+		Representation entity = new FileRepresentation(
+				file,
+				MediaType.MULTIPART_FORM_DATA);
+
+		FormDataSet fds = new FormDataSet();
+		FormData fd = new FormData(
+				"file",
+				entity);
+		fds.getEntries().add(
+				fd);
+		fds.setMultipart(true);
+
+		Representation r = resourceUpload.post(fds);
+
+		System.out.println(r);
+
+		// JSONParser parser = new JSONParser();
+		// JSONObject obj = (JSONObject) parser.parse(result);
+		// String name = (String) obj.get("store1");
+		// assertTrue(
+		// "'name' is 'value'",
+		// name.equals("store2"));
+
+		// ingest data into store with index
+		ClientResource resourceIngest = new ClientResource(
+				"http://localhost:5152/geowave/ingest/localToGW");
+		resourceIngest.setChallengeResponse(
+				ChallengeScheme.HTTP_BASIC,
+				"admin",
+				"password");
+		Form formIngest = new Form();
+		// TODO change to uploaded file name
+		formIngest.add(
+				"path",
+				"../../test/src/test/resources/mil/nga/giat/geowave/test/basic-testdata.zip");
 		formIngest.add(
 				"storename",
 				"store1");
