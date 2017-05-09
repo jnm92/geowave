@@ -598,24 +598,21 @@ public class RestServerTest
 				file,
 				MediaType.MULTIPART_FORM_DATA);
 
-		FormDataSet fds = new FormDataSet();
-		FormData fd = new FormData(
+		FormDataSet set = new FormDataSet();
+		FormData data = new FormData(
 				"file",
 				entity);
-		fds.getEntries().add(
-				fd);
-		fds.setMultipart(true);
+		set.getEntries().add(
+				data);
+		set.setMultipart(true);
 
-		Representation r = resourceUpload.post(fds);
+		String text = resourceUpload.post(
+				set).getText();
 
-		System.out.println(r);
-
-		// JSONParser parser = new JSONParser();
-		// JSONObject obj = (JSONObject) parser.parse(result);
-		// String name = (String) obj.get("store1");
-		// assertTrue(
-		// "'name' is 'value'",
-		// name.equals("store2"));
+		// Get name of uploaded file
+		JSONParser parser = new JSONParser();
+		JSONObject obj = (JSONObject) parser.parse(text);
+		String name = (String) obj.get("name");
 
 		// ingest data into store with index
 		ClientResource resourceIngest = new ClientResource(
@@ -625,10 +622,9 @@ public class RestServerTest
 				"admin",
 				"password");
 		Form formIngest = new Form();
-		// TODO change to uploaded file name
 		formIngest.add(
 				"path",
-				"../../test/src/test/resources/mil/nga/giat/geowave/test/basic-testdata.zip");
+				name); // specify uploaded file
 		formIngest.add(
 				"storename",
 				"store1");
